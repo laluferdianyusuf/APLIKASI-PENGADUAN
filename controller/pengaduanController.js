@@ -70,6 +70,7 @@ module.exports = {
         psychology,
         economy,
         chronology,
+        status: "Menunggu konfirmasi",
       });
 
       // Kembalikan respons berhasil
@@ -149,6 +150,7 @@ module.exports = {
         psychology,
         economy,
         chronology,
+        status: "Menunggu Konfirmasi",
       });
 
       res.status(200).json({
@@ -165,7 +167,6 @@ module.exports = {
       });
     }
   },
-
   async deletePengaduan(req, res) {
     try {
       const { id } = req.params;
@@ -256,4 +257,42 @@ module.exports = {
       });
     }
   },
+  // async complaintStatus(req, res) {
+  //   try {
+  //     const { id } = req.params;
+  //     const getPengaduanById = await pengaduan.findOne({ where: { id } });
+  //     if (!getPengaduanById) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: "Complain not found",
+  //       });
+  //     }
+  //     const updateComplaint = await getPengaduanById.update({
+  //       status: "Sedamg diproses",
+  //     });
+  //     res.status(200).json({
+  //       status: true,
+  //       message: "Complaint status updated to 'sedang diproses'",
+  //       data: updateComplaint,
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     res.status(500).json({
+  //       status: false,
+  //       message: "Failed to update complaint status",
+  //     });
+  //   }
+  // },
+  // async getProgres(req, res) {
+  //   const { processId } = req.params;
+  //   const progress = progressStatus[processId];
+
+  //   if (progress) {
+  //     res.status(200).json(progress);
+  //   } else {
+  //     res.status(404).json({
+  //       message: "Process not found",
+  //     });
+  //   }
+  // },
 };
