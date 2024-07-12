@@ -21,10 +21,8 @@ app.get("/", (req, res) => {
 // app.get("/admin", authController.authorizeAdmin);
 app.post("/admin/register", adminController.registerAdmin);
 app.post("/admin/login", adminController.loginAdmin);
-// app.put(
-//   "/admin/update/:id",
-//   middleware.authenticate,
-//   adminController.updateAdmin
+app.put("/admin/update/complaint/:id", adminController.complaintUpdate);
+app.put("/admin/done/complaint/:id", adminController.complaintDone);
 app.put(
   "/admin/update/:id",
   authController.authorizeAdmin,
@@ -34,6 +32,7 @@ app.put(
 // Complaint form client
 app.post("/klien/create", pengaduanController.complaintClient);
 app.put("/klien/update/:id", pengaduanController.updatePengaduan);
+app.put("/klien/update/status/:id", pengaduanController.complaintClient);
 app.delete("/klien/delete/:id", pengaduanController.deletePengaduan);
 app.get("/klien/getAll", pengaduanController.getAllCase);
 app.get("/klien/getCase", pengaduanController.getPengaduan);
