@@ -33,6 +33,8 @@ module.exports = (sequelize, DataTypes) => {
       psychology: DataTypes.STRING,
       economy: DataTypes.STRING,
       chronology: DataTypes.STRING,
+      status: DataTypes,
+      STRING,
     },
     {
       sequelize,
