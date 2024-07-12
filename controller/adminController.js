@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { admin } = require("../models");
 const { JWT } = require("../lib/const");
+const { pengaduan } = require("../models");
 
 module.exports = {
   async registerAdmin(req, res) {
@@ -53,6 +54,60 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+    }
+  },
+  async complaintUpdate(req, res) {
+    try {
+      const { id } = req.params;
+      const getPengaduan = await pengaduan.findByPk(id);
+      console.log("getPengaduan: ", getPengaduan);
+
+      if (!getPengaduan) {
+        return res.status(400).json({
+          status: false,
+          message: "complaint not found",
+        });
+      }
+      const updatePengaduan = await getPengaduan.update({
+        status: "Sedang diproses",
+      });
+      res.status(200).json({
+        status: true,
+        message: "Complaint status updated to 'sedang diproses'",
+        data: updatePengaduan,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        status: false,
+        message: "Failed to update complaint status",
+      });
+    }
+  },
+  async complaintDone(req, res) {
+    try {
+      const { id } = req.params;
+      const getPengaduan = await pengaduan.findByPk(id);
+      if (!getPengaduan) {
+        return res.status(400).json({
+          status: false,
+          message: "Complaint not found",
+        });
+      }
+      const pengaduanDone = await getPengaduan.update({
+        status: "Kasus Telah Selesai",
+      });
+      res.status(200).json({
+        status: true,
+        message: "Complaint status updated to 'Kasus Telah Selesai'",
+        data: pengaduanDone,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        status: false,
+        message: "Failed to update complaint status",
+      });
     }
   },
   async updateAdmin(req, res) {
