@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { admin } = require("../models");
-const { JWT } = require("../lib/const");
+const { JWT, ROLES } = require("../lib/const");
 const { pengaduan } = require("../models");
 
 module.exports = {
@@ -10,8 +10,10 @@ module.exports = {
     const admins = await admin.create({
       name: req.body.name,
       username: req.body.username,
+      email: req.body.email,
       phoneNumber: req.body.phoneNumber,
       password: await bcrypt.hash(password, JWT.SALT_ROUND),
+      role: ROLES.SUPERADMIN,
     });
     res.status(201).json({
       status: "Ok",
@@ -54,6 +56,35 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+    }
+  },
+  async updateAdmin(req, res) {
+    try {
+      const token = req.tokenPayload;
+      const id = token.id;
+      const admins = await admin.findAll({ where: { id: id } });
+      console.log("Current admin: ", admins);
+      const { name, username, email, phoneNumber } = req.body;
+      const updateAdmin = admin.update(
+        {
+          name,
+          username,
+          email,
+          phoneNumber,
+        },
+        { where: { id: id } }
+      );
+      console.log("Updated admin: ", updateAdmin);
+      res.status(201).json({
+        status: "OK",
+        message: "Admin Successfully Updated",
+        data: updateAdmin,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(404).json({
+        message: "Admin Not Found",
+      });
     }
   },
   async complaintUpdate(req, res) {
@@ -110,34 +141,14 @@ module.exports = {
       });
     }
   },
-  async updateAdmin(req, res) {
-    try {
-      const token = req.tokenPayload;
-      const id = token.id;
-      const adminUpdate = await admin.findOne({ where: { id } });
-      console.log("adminUpdate: ", adminUpdate);
-      const admins = admin.update(
-        {
-          name: req.body.name ? req.body.name : adminUpdate.name,
-          username: req.body.username
-            ? req.body.username
-            : adminUpdate.username,
-          phoneNumber: req.body.phoneNumber
-            ? req.body.phoneNumber
-            : adminUpdate.phoneNumber,
-        },
-        { where: { id } }
-      );
-      res.status(201).json({
-        status: "OK",
-        message: "Admin Successfully Updated",
-        data: admins,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(404).json({
-        message: "Admin Not Found",
+  async getByEmail(req, res) {
+    const getUser = await User.findOne({ where: { email: email } });
+    if (!getUser) {
+      res.status(401).json({
+        status: false,
+        message: "Cannot get Users",
       });
     }
+    return getUser;
   },
 };

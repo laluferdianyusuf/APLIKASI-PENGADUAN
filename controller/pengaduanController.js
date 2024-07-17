@@ -4,6 +4,8 @@ const { pengaduan } = require("../models");
 module.exports = {
   async complaintClient(req, res) {
     try {
+      const user_id = req.users.id;
+      console.log(user_id);
       const {
         name,
         born,
@@ -52,6 +54,7 @@ module.exports = {
       }
       // Buat pengaduan baru
       const createPengaduan = await pengaduan.create({
+        userid: user_id,
         name,
         born,
         gender,
@@ -128,6 +131,24 @@ module.exports = {
         return res.status(400).json({
           status: "FAIL",
           message: "Physical details are required for physical violence cases",
+        });
+      }
+      if (caseViolence == "sexual" && !sexual) {
+        return res.status(200).json({
+          status: false,
+          message: "isRequire",
+        });
+      }
+      if (caseViolence == "psikologi" && !psychology) {
+        return res.status(200).json({
+          status: false,
+          message: "isRequire",
+        });
+      }
+      if (caseViolence == "ekonomi" && !economy) {
+        return res.status(200).json({
+          status: false,
+          message: "isRequire",
         });
       }
 
@@ -234,6 +255,30 @@ module.exports = {
       });
     }
   },
+  async getPengaduanByUserId(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await pengaduan.findByPk(id);
+      if (!result) {
+        res.status(404).json({
+          status: false,
+          message: "Cannot find any case",
+        });
+      }
+      if (result) {
+        res.status(200).json({
+          status: "Ok",
+          data: result,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({
+        status: false,
+        message: "Something whem wrong with the server",
+      });
+    }
+  },
   async getGender(req, res) {
     try {
       const { gender } = req.query;
@@ -257,42 +302,4 @@ module.exports = {
       });
     }
   },
-  // async complaintStatus(req, res) {
-  //   try {
-  //     const { id } = req.params;
-  //     const getPengaduanById = await pengaduan.findOne({ where: { id } });
-  //     if (!getPengaduanById) {
-  //       return res.status(400).json({
-  //         status: false,
-  //         message: "Complain not found",
-  //       });
-  //     }
-  //     const updateComplaint = await getPengaduanById.update({
-  //       status: "Sedamg diproses",
-  //     });
-  //     res.status(200).json({
-  //       status: true,
-  //       message: "Complaint status updated to 'sedang diproses'",
-  //       data: updateComplaint,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     res.status(500).json({
-  //       status: false,
-  //       message: "Failed to update complaint status",
-  //     });
-  //   }
-  // },
-  // async getProgres(req, res) {
-  //   const { processId } = req.params;
-  //   const progress = progressStatus[processId];
-
-  //   if (progress) {
-  //     res.status(200).json(progress);
-  //   } else {
-  //     res.status(404).json({
-  //       message: "Process not found",
-  //     });
-  //   }
-  // },
 };
