@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   pengaduan.init(
     {
+      userid: DataTypes.INTEGER,
       name: DataTypes.STRING,
       born: DataTypes.STRING,
       gender: DataTypes.STRING,
