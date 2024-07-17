@@ -1,30 +1,35 @@
 import React, { useState } from "react";
+import {
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Text,
+} from "react-native";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import AdminButton from "../components/AdminButton";
-import { emailValidator } from "../helpers/emailValidator";
-import { passwordValidator } from "../helpers/passwordValidator";
+import { usernameValidator, passwordValidator } from "../helpers/validator";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { TouchableOpacity, View, StyleSheet, Text } from "react-native";
 import { theme } from "../themes/theme";
-import { getStatusBarHeight } from "react-native-status-bar-height";
 
 export default function LoginUserScreen({ navigation }) {
-  const [email, setEmail] = useState({ value: "", error: "" });
+  const [username, setUsername] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const onLoginPressed = async () => {
-    const emailError = emailValidator(email.value);
+    const usernameError = usernameValidator(username.value);
     const passwordError = passwordValidator(password.value);
-    if (emailError || passwordError) {
-      setEmail({ ...email, error: emailError });
+    if (usernameError || passwordError) {
+      setUsername({ ...username, error: usernameError });
       setPassword({ ...password, error: passwordError });
       return;
     }
@@ -32,38 +37,44 @@ export default function LoginUserScreen({ navigation }) {
     try {
       setIsLoading(true);
       const loginPayload = {
-        email: email.value,
+        username: username.value,
         password: password.value,
       };
       const request = await axios.post(
-        "https://pln-backend.vercel.app/...",
+        "http://192.168.1.4:1000/login/user",
         loginPayload
       );
       const response = request.data;
+      console.log(response);
 
       setIsLoading(false);
-      if (response.status_info) {
-        AsyncStorage.setItem("savedEmail", email.value);
+      if (response.status) {
+        AsyncStorage.setItem("savedEmail", username.value);
         AsyncStorage.setItem("savedPassword", password.value);
         AsyncStorage.setItem("token", response.data.token);
         Toast.show({
           type: ALERT_TYPE.SUCCESS,
           title: "Login Successfully",
-          textBody: "Make Your Report Quickly.",
-          autoClose: 1,
+          textBody: response.message,
         });
         navigation.reset({
           index: 0,
-          routes: [{ name: "Dashboard" }],
+          routes: [{ name: "NavigatorScreen" }],
+        });
+      } else {
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: "Login Error",
+          textBody: response.message,
         });
       }
     } catch (error) {
+      console.log(error);
       setIsLoading(false);
       Toast.show({
         type: ALERT_TYPE.DANGER,
         title: "Login Failed",
         textBody: `${error.response.data.message}`,
-        autoClose: 1,
       });
     }
   };
@@ -85,76 +96,93 @@ export default function LoginUserScreen({ navigation }) {
   };
 
   return (
-    <Background>
-      <AdminButton loginAdmin={handleGoAdminScreen} />
-      <Logo />
-      {/* <Header>Welcome back.</Header> */}
-      <TextInput
-        label="Username"
-        returnKeyType="next"
-        value={email.value}
-        onChangeText={(text) => setEmail({ value: text, error: "" })}
-        error={!!email.error}
-        errorText={email.error}
-        autoCapitalize="none"
-        autoCompleteType="email"
-        textContentType="emailAddress"
-        keyboardType="email-address"
-      />
-      <View style={styles.passwordContainer}>
-        <TextInput
-          label="Password"
-          returnKeyType="done"
-          value={password.value}
-          onChangeText={(text) => setPassword({ value: text, error: "" })}
-          error={!!password.error}
-          errorText={password.error}
-          secureTextEntry={!showPassword}
-        />
-        <TouchableOpacity
-          onPress={toggleShowPassword}
-          style={styles.eyeIconContainer}
-        >
-          <Icon
-            name={`${showPassword ? "lock-open" : "lock"}`}
-            color={theme.colors.error}
-            size={20}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <Background>
+          <AdminButton loginAdmin={handleGoAdminScreen} />
+          <Logo />
+          <TextInput
+            label="Username"
+            returnKeyType="next"
+            value={username.value}
+            onChangeText={(text) => setUsername({ value: text, error: "" })}
+            error={!!username.error}
+            errorText={username.error}
+            autoCapitalize="none"
+            autoCompleteType="username"
+            textContentType="username"
+            keyboardType="username"
           />
-        </TouchableOpacity>
-      </View>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              label="Password"
+              returnKeyType="done"
+              value={password.value}
+              onChangeText={(text) => setPassword({ value: text, error: "" })}
+              error={!!password.error}
+              errorText={password.error}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity
+              onPress={toggleShowPassword}
+              style={styles.eyeIconContainer}
+            >
+              <Icon
+                name={`${showPassword ? "lock-open" : "lock"}`}
+                color={theme.colors.error}
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
 
-      <Button mode="contained" onPress={onLoginPressed} disabled={isLoading}>
-        {isLoading ? "..." : "MASUK"}
-      </Button>
+          <Button
+            mode="contained"
+            onPress={onLoginPressed}
+            disabled={isLoading}
+          >
+            {isLoading ? "..." : "MASUK"}
+          </Button>
 
-      <View className="flex flex-row gap-2">
-        <Text className="text-gray-400 font-bold">Belum Punya Akun ? </Text>
-        <TouchableOpacity onPress={handleGoRegister}>
-          <Text className="font-bold underline" style={styles.TextStyle}>
-            Silahkan Daftar Disini
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View className="flex flex-row gap-2" style={styles.DataLink}>
-        {/* <Text className="text-gray-400 font-bold">Lihat  </Text> */}
-        <TouchableOpacity onPress={handleGoMainScreen}>
-          <Text className="font-bold underline" style={styles.TextStyle}>
-            Lihat Ringkasan Data
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </Background>
+          <View style={styles.registerContainer}>
+            <Text style={styles.registerText}>Belum Punya Akun ? </Text>
+            <TouchableOpacity onPress={handleGoRegister}>
+              <Text className="font-bold underline" style={styles.TextStyle}>
+                Silahkan Daftar Disini
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            onPress={handleGoMainScreen}
+            style={styles.DataLink}
+          >
+            <Text className="font-bold underline" style={styles.TextStyle}>
+              Lihat Ringkasan Data
+            </Text>
+          </TouchableOpacity>
+        </Background>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  scrollView: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 16,
+  },
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
     position: "relative",
   },
-
   eyeIconContainer: {
     padding: 10,
     paddingTop: 15,
@@ -166,6 +194,15 @@ const styles = StyleSheet.create({
   },
   DataLink: {
     position: "absolute",
-    bottom: 15 + getStatusBarHeight(),
+    bottom: 10,
+  },
+  registerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  registerText: {
+    color: "gray",
+    fontWeight: "bold",
   },
 });
