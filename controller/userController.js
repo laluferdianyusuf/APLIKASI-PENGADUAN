@@ -13,7 +13,7 @@ module.exports = {
         return res.status(401).json({
           status: false,
           message: "Password minimal 8 karakter",
-          data: null,
+          data: { user: null },
         });
       }
       const existingEmail = await User.findOne({ where: { email } });
@@ -21,7 +21,7 @@ module.exports = {
         return res.status(402).json({
           status: false,
           message: "Email sudah didaftarkan",
-          data: null,
+          data: { user: null },
         });
       }
       const user = await User.create({
@@ -36,14 +36,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "Berhasil melakukan registrasi",
-        data: { user },
+        data: { user: user },
       });
     } catch (error) {
       console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal melakukan registrasi",
-        data: null,
+        data: { user: null },
       });
     }
   },
@@ -57,7 +57,7 @@ module.exports = {
         res.status(401).json({
           status: false,
           message: "Akun tidak di temukan ",
-          data: null,
+          data: { user: null },
         });
         return;
       }
@@ -69,7 +69,7 @@ module.exports = {
         res.status(402).json({
           status: false,
           message: "Akun tidak di temukan ",
-          data: null,
+          data: { user: null },
         });
         return;
       }
@@ -92,7 +92,7 @@ module.exports = {
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
-        data: null,
+        data: { user: null },
       });
     }
   },
@@ -101,7 +101,7 @@ module.exports = {
     return res.status(200).json({
       status: true,
       message: "Mendapatkan User",
-      data: { currentUser },
+      data: { user: currentUser },
     });
   },
   async updateUser(req, res) {
@@ -114,7 +114,7 @@ module.exports = {
         return res.status(404).json({
           status: false,
           message: "Gagal melakukan update",
-          data: null,
+          data: { user: null },
         });
       }
       const { name, username, email, phoneNumber, address } = req.body;
@@ -129,14 +129,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "Berhasil melakukan update",
-        data: { updateUser },
+        data: { user: updateUser },
       });
     } catch (error) {
       console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal melakukan update",
-        data: null,
+        data: { user: null },
       });
     }
   },
@@ -148,20 +148,20 @@ module.exports = {
         return res.status(404).json({
           status: false,
           message: "User Tidak ditemukan",
-          data: null,
+          data: { user: null },
         });
       }
       return res.status(200).json({
         status: true,
         message: "Akun berhasil dihapus",
-        data: { result },
+        data: { user: result },
       });
     } catch (error) {
       console.log(error);
       res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
-        data: null,
+        data: { user: null },
       });
     }
   },
@@ -171,14 +171,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "List user",
-        data: { user },
+        data: { user: user },
       });
     } catch (error) {
       console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal mendapatkan semua user",
-        data: null,
+        data: { user: null },
       });
     }
   },
@@ -190,14 +190,14 @@ module.exports = {
         return res.status(404).json({
           status: false,
           message: "User tidak ditemukan",
-          data: null,
+          data: { user: null },
         });
       }
       if (user) {
         return res.status(200).json({
           status: true,
           message: "Berhasil mendapatkan user",
-          data: { user },
+          data: { user: user },
         });
       }
     } catch (error) {
@@ -205,7 +205,7 @@ module.exports = {
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
-        data: null,
+        data: { user: null },
       });
     }
   },

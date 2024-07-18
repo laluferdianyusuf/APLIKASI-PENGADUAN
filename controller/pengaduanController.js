@@ -29,30 +29,30 @@ module.exports = {
       console.log(caseViolence);
       if (caseViolence == "fisik" && !physical) {
         return res.status(200).json({
-          status: false,
+          status: true,
           message: "Harus diisi",
-          data: null,
+          data: { complaint: null },
         });
       }
       if (caseViolence == "sexual" && !sexual) {
         return res.status(200).json({
-          status: false,
+          status: true,
           message: "Harus diisi",
-          data: null,
+          data: { complaint: null },
         });
       }
       if (caseViolence == "psikologi" && !psychology) {
         return res.status(200).json({
-          status: false,
+          status: true,
           message: "Harus diisi",
-          data: null,
+          data: { complaint: null },
         });
       }
       if (caseViolence == "ekonomi" && !economy) {
         return res.status(200).json({
-          status: false,
+          status: true,
           message: "Harus diisi",
-          data: null,
+          data: { complaint: null },
         });
       }
       const createPengaduan = await pengaduan.create({
@@ -80,14 +80,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "Berhasil Membuat Pengaduan",
-        data: { createPengaduan },
+        data: { complaint: createPengaduan },
       });
     } catch (error) {
       console.error(error);
       return res.status(400).json({
         status: false,
         message: "Gagal Membuat Pengaduan",
-        data: null,
+        data: { complaint: null },
       });
     }
   },
@@ -102,7 +102,7 @@ module.exports = {
         return res.status(500).json({
           status: false,
           message: "Pengaduan tidak ditemukan",
-          data: null,
+          data: { complaint: null },
         });
       }
 
@@ -130,28 +130,28 @@ module.exports = {
         return res.status(401).json({
           status: false,
           message: "Harus diisi",
-          data: null,
+          data: { complaint: null },
         });
       }
       if (caseViolence == "sexual" && !sexual) {
         return res.status(402).json({
           status: false,
           message: "Harus diisi",
-          data: null,
+          data: { complaint: null },
         });
       }
       if (caseViolence == "psikologi" && !psychology) {
         return res.status(403).json({
           status: false,
           message: "Harus diisi",
-          data: null,
+          data: { complaint: null },
         });
       }
       if (caseViolence == "ekonomi" && !economy) {
         return res.status(404).json({
           status: false,
           message: "Harus diisi",
-          data: null,
+          data: { complaint: null },
         });
       }
 
@@ -181,14 +181,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "Update Sukses",
-        data: { updatePengaduan },
+        data: { complaint: updatePengaduan },
       });
     } catch (error) {
       console.error(error);
       return res.status(400).json({
         status: false,
         message: "Gagal Update Pengaduan",
-        data: null,
+        data: { complaint: null },
       });
     }
   },
@@ -209,14 +209,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "Berhasil Menghapus Pengaduan",
-        data: { result },
+        data: { complaint: result },
       });
     } catch (error) {
       console.log(error);
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
-        data: null,
+        data: { complaint: null },
       });
     }
   },
@@ -226,14 +226,15 @@ module.exports = {
       if (getComplaint) {
         console.log(getComplaint);
         return res.status(200).json({
+          status: true,
           massage: "List Pengaduan",
-          data: { getComplaint },
+          data: { complaint: getComplaint },
         });
       } else {
         return res.status(401).json({
-          status: true,
+          status: false,
           massage: "List Pengaduan Tidak ditemukan",
-          data: null,
+          data: { complaint: null },
         });
       }
     } catch (error) {
@@ -241,7 +242,7 @@ module.exports = {
       return res.json(400).json({
         status: false,
         massage: "Unauthorize Access",
-        data: null,
+        data: { complaint: null },
       });
     }
   },
@@ -256,13 +257,13 @@ module.exports = {
         return res.status(200).json({
           status: true,
           massage: "List Pengaduan berdasarkan jenis kekerasan",
-          data: { getComplaint },
+          data: { complaint: getComplaint },
         });
       } else {
         return res.status(404).json({
           status: false,
           massage: "List Pengaduan tidak ditemukan",
-          data: null,
+          data: { complaint: null },
         });
       }
     } catch (error) {
@@ -270,7 +271,7 @@ module.exports = {
       return res.status(400).json({
         status: false,
         massage: "Unauthorize Access",
-        data: null,
+        data: { complaint: null },
       });
     }
   },
@@ -282,14 +283,14 @@ module.exports = {
         return res.status(404).json({
           status: false,
           message: "Kasus tidak ditemukan",
-          data: null,
+          data: { complaint: null },
         });
       }
       if (result) {
         return res.status(200).json({
           status: true,
           message: "Berhasil mendapatkan pengaduan",
-          data: { result },
+          data: { complaint: result },
         });
       }
     } catch (error) {
@@ -297,7 +298,7 @@ module.exports = {
       res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
-        data: null,
+        data: { complaint: null },
       });
     }
   },
@@ -310,13 +311,13 @@ module.exports = {
         return res.status(200).json({
           status: true,
           massage: "List Pengaduan",
-          data: { getComplaint },
+          data: { complaint: getComplaint },
         });
       } else {
         return res.status(404).json({
           status: false,
           massage: "List Pengaduan Tidak di temukan",
-          data: null,
+          data: { complaint: null },
         });
       }
     } catch (error) {
@@ -324,7 +325,7 @@ module.exports = {
       return res.status(400).json({
         status: false,
         massage: "Unauthorize Access",
-        data: null,
+        data: { complaint: null },
       });
     }
   },
@@ -336,7 +337,7 @@ module.exports = {
         return res.status(401).json({
           status: false,
           message: "Kasus tidak dapat ditemukan",
-          data: null,
+          data: { complaint: null },
         });
       }
       return res.status(200).json({
@@ -349,7 +350,7 @@ module.exports = {
       return res.status(400).json({
         status: false,
         message: "Terjadai kesalahn pada server",
-        data: null,
+        data: { complaint: null },
       });
     }
   },

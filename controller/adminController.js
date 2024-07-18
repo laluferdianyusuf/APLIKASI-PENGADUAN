@@ -19,7 +19,7 @@ module.exports = {
     return res.status(200).json({
       status: true,
       message: "Berhasil melakukan registrasi admin",
-      data: { admins },
+      data: { admins: admins },
     });
   },
   async loginAdmin(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
         res.status(404).json({
           status: false,
           message: "Akun tidak ditemukan",
-          data: null,
+          data: { admins: null },
         });
         return;
       }
@@ -44,7 +44,7 @@ module.exports = {
         res.status(402).json({
           status: false,
           message: "Akun tidak ditemukan",
-          data: null,
+          data: { admins: null },
         });
         return;
       }
@@ -66,7 +66,7 @@ module.exports = {
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalah pada server",
-        data: null,
+        data: { admins: null },
       });
     }
   },
@@ -79,7 +79,7 @@ module.exports = {
         return res.status(404).json({
           status: false,
           message: "Gagal melakukan update",
-          data: null,
+          data: { admins: null },
         });
       }
       const { name, username, email, address, phoneNumber } = req.body;
@@ -94,14 +94,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "Admin berhasil di perbarui",
-        data: { updateAdmin },
+        data: { admins: updateAdmin },
       });
     } catch (error) {
       console.log(error);
       return res.status(400).json({
         status: false,
         message: "Admin tidak di temukan",
-        data: null,
+        data: { admins: null },
       });
     }
   },
@@ -115,7 +115,7 @@ module.exports = {
         return res.status(401).json({
           status: false,
           message: "Pengaduan tidak ditemukan",
-          data: null,
+          data: { admins: null },
         });
       }
       const updatePengaduan = await getPengaduan.update({
@@ -124,14 +124,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "Status pengaduan diperbarui ke 'sedang diproses'",
-        data: { updatePengaduan },
+        data: { admins: updatePengaduan },
       });
     } catch (error) {
       console.log(error);
       res.status(400).json({
         status: false,
         message: "Gagal memperbarui status pengaduan",
-        data: null,
+        data: { admins: null },
       });
     }
   },
@@ -143,7 +143,7 @@ module.exports = {
         return res.status(401).json({
           status: false,
           message: "Pengaduan tidak ditemukan",
-          data: null,
+          data: { admins: null },
         });
       }
       const pengaduanDone = await getPengaduan.update({
@@ -152,14 +152,14 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "Status pengaduan diperbarui ke 'Kasus Telah Selesai'",
-        data: { pengaduanDone },
+        data: { admins: pengaduanDone },
       });
     } catch (error) {
       console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal melakukan pembaruan status pengaduan",
-        data: null,
+        data: { admins: null },
       });
     }
   },
