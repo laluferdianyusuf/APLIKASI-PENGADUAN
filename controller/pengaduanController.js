@@ -4,7 +4,7 @@ const { pengaduan } = require("../models");
 module.exports = {
   async complaintClient(req, res) {
     try {
-      const user_id = req.users.id;
+      const user_id = req.user.id;
       console.log(user_id);
       const {
         name,
@@ -27,32 +27,34 @@ module.exports = {
         chronology,
       } = req.body;
       console.log(caseViolence);
-      // Cek jika caseViolence adalah "fisik"
       if (caseViolence == "fisik" && !physical) {
         return res.status(200).json({
           status: false,
-          message: "isRequire",
+          message: "Harus diisi",
+          data: null,
         });
       }
       if (caseViolence == "sexual" && !sexual) {
         return res.status(200).json({
           status: false,
-          message: "isRequire",
+          message: "Harus diisi",
+          data: null,
         });
       }
       if (caseViolence == "psikologi" && !psychology) {
         return res.status(200).json({
           status: false,
-          message: "isRequire",
+          message: "Harus diisi",
+          data: null,
         });
       }
       if (caseViolence == "ekonomi" && !economy) {
         return res.status(200).json({
           status: false,
-          message: "isRequire",
+          message: "Harus diisi",
+          data: null,
         });
       }
-      // Buat pengaduan baru
       const createPengaduan = await pengaduan.create({
         userid: user_id,
         name,
@@ -75,19 +77,16 @@ module.exports = {
         chronology,
         status: "Menunggu konfirmasi",
       });
-
-      // Kembalikan respons berhasil
-      return res.status(201).json({
-        status: "OK",
-        message: "Successfully created complaint",
-        data: createPengaduan,
+      return res.status(200).json({
+        status: true,
+        message: "Berhasil Membuat Pengaduan",
+        data: { createPengaduan },
       });
     } catch (error) {
       console.error(error);
-      // Kembalikan respons gagal
-      return res.status(500).json({
+      return res.status(400).json({
         status: false,
-        message: "Failed to create complaint",
+        message: "Gagal Membuat Pengaduan",
         data: null,
       });
     }
@@ -95,13 +94,15 @@ module.exports = {
 
   async updatePengaduan(req, res) {
     try {
+      const user_id = req.user.id;
+      console.log(user_id);
       const { id } = req.params;
-      const getPengaduanById = await pengaduan.findByPk(id); // Menggunakan findByPk untuk mencari berdasarkan primary key
-
+      const getPengaduanById = await pengaduan.findByPk(id);
       if (!getPengaduanById) {
-        return res.status(404).json({
+        return res.status(500).json({
           status: false,
-          message: "Pengaduan not found",
+          message: "Pengaduan tidak ditemukan",
+          data: null,
         });
       }
 
@@ -125,34 +126,37 @@ module.exports = {
         economy,
         chronology,
       } = req.body;
-
-      // Cek jika caseViolence adalah "fisik" dan physical tidak diisi
       if (caseViolence === "fisik" && !physical) {
-        return res.status(400).json({
-          status: "FAIL",
-          message: "Physical details are required for physical violence cases",
+        return res.status(401).json({
+          status: false,
+          message: "Harus diisi",
+          data: null,
         });
       }
       if (caseViolence == "sexual" && !sexual) {
-        return res.status(200).json({
+        return res.status(402).json({
           status: false,
-          message: "isRequire",
+          message: "Harus diisi",
+          data: null,
         });
       }
       if (caseViolence == "psikologi" && !psychology) {
-        return res.status(200).json({
+        return res.status(403).json({
           status: false,
-          message: "isRequire",
+          message: "Harus diisi",
+          data: null,
         });
       }
       if (caseViolence == "ekonomi" && !economy) {
-        return res.status(200).json({
+        return res.status(404).json({
           status: false,
-          message: "isRequire",
+          message: "Harus diisi",
+          data: null,
         });
       }
 
       const updatePengaduan = await getPengaduanById.update({
+        userid: user_id,
         name,
         born,
         gender,
@@ -174,37 +178,45 @@ module.exports = {
         status: "Menunggu Konfirmasi",
       });
 
-      res.status(200).json({
+      return res.status(200).json({
         status: true,
         message: "Update Sukses",
-        data: updatePengaduan,
+        data: { updatePengaduan },
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({
+      return res.status(400).json({
         status: false,
-        message: "Failed to update complaint",
+        message: "Gagal Update Pengaduan",
         data: null,
       });
     }
   },
   async deletePengaduan(req, res) {
     try {
+      const user_id = req.user.id;
+      console.log(user_id);
       const { id } = req.params;
-      const result = await pengaduan.destroy({ where: { id } });
+      const result = await pengaduan.destroy({
+        where: { id, userid: user_id },
+      });
       if (!result) {
-        res.status(404).json({
+        return res.status(404).json({
           deletedby: req.result,
-          message: "Complaint not found",
+          message: "Pengaudan Tidak ditemukan",
         });
       }
-      res.json({
-        message: "Complaint Successfully deleted",
+      return res.status(200).json({
+        status: true,
+        message: "Berhasil Menghapus Pengaduan",
+        data: { result },
       });
     } catch (error) {
       console.log(error);
-      res.status(500).json({
-        message: "something went wrong with the server",
+      return res.status(400).json({
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: null,
       });
     }
   },
@@ -213,20 +225,23 @@ module.exports = {
       const getComplaint = await pengaduan.findAll();
       if (getComplaint) {
         console.log(getComplaint);
-        res.status(200).json({
-          massage: "Complaint List",
-          data: getComplaint,
+        return res.status(200).json({
+          massage: "List Pengaduan",
+          data: { getComplaint },
         });
       } else {
-        res.status(404).json({
-          massage: "Complain list not found",
+        return res.status(401).json({
+          status: true,
+          massage: "List Pengaduan Tidak ditemukan",
           data: null,
         });
       }
     } catch (error) {
       console.log(error);
-      res.json(404).json({
+      return res.json(400).json({
+        status: false,
         massage: "Unauthorize Access",
+        data: null,
       });
     }
   },
@@ -238,44 +253,51 @@ module.exports = {
       });
       if (getComplaint && getComplaint.length > 0) {
         console.log(getComplaint);
-        res.status(200).json({
-          massage: "Complaint List",
-          data: getComplaint,
+        return res.status(200).json({
+          status: true,
+          massage: "List Pengaduan berdasarkan jenis kekerasan",
+          data: { getComplaint },
         });
       } else {
-        res.status(404).json({
-          massage: "Complain list not found",
+        return res.status(404).json({
+          status: false,
+          massage: "List Pengaduan tidak ditemukan",
           data: null,
         });
       }
     } catch (error) {
       console.log(error);
-      res.json(404).json({
+      return res.status(400).json({
+        status: false,
         massage: "Unauthorize Access",
+        data: null,
       });
     }
   },
   async getPengaduanByUserId(req, res) {
     try {
-      const { id } = req.params;
-      const result = await pengaduan.findByPk(id);
+      const userId = req.user.id;
+      const result = await pengaduan.findAll({ where: { userId: userId } });
       if (!result) {
-        res.status(404).json({
+        return res.status(404).json({
           status: false,
-          message: "Cannot find any case",
+          message: "Kasus tidak ditemukan",
+          data: null,
         });
       }
       if (result) {
-        res.status(200).json({
-          status: "Ok",
-          data: result,
+        return res.status(200).json({
+          status: true,
+          message: "Berhasil mendapatkan pengaduan",
+          data: { result },
         });
       }
     } catch (error) {
       console.log(error);
       res.status(400).json({
         status: false,
-        message: "Something whem wrong with the server",
+        message: "Terjadi kesalahan pada server",
+        data: null,
       });
     }
   },
@@ -285,20 +307,49 @@ module.exports = {
       const getComplaint = await pengaduan.findAll({ where: { gender } });
       if (getComplaint && getComplaint.length > 0) {
         console.log(getComplaint);
-        res.status(200).json({
-          massage: "Complaint List",
-          data: getComplaint,
+        return res.status(200).json({
+          status: true,
+          massage: "List Pengaduan",
+          data: { getComplaint },
         });
       } else {
-        res.status(404).json({
-          massage: "Complain list not found",
+        return res.status(404).json({
+          status: false,
+          massage: "List Pengaduan Tidak di temukan",
           data: null,
         });
       }
     } catch (error) {
       console.log(error);
-      res.json(404).json({
+      return res.status(400).json({
+        status: false,
         massage: "Unauthorize Access",
+        data: null,
+      });
+    }
+  },
+  async getCasebyId(req, res) {
+    try {
+      const { id } = req.params;
+      const getCase = await pengaduan.findByPk(id);
+      if (!getCase) {
+        return res.status(401).json({
+          status: false,
+          message: "Kasus tidak dapat ditemukan",
+          data: null,
+        });
+      }
+      return res.status(200).json({
+        status: true,
+        message: "List Pengaduan berdasarkan id",
+        data: getCase,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        status: false,
+        message: "Terjadai kesalahn pada server",
+        data: null,
       });
     }
   },
