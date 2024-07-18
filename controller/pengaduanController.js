@@ -220,7 +220,7 @@ module.exports = {
       });
     }
   },
-  async getAllCase(req, res) {
+  async listComplaint(req, res) {
     try {
       const getComplaint = await pengaduan.findAll();
       if (getComplaint) {
@@ -275,7 +275,7 @@ module.exports = {
       });
     }
   },
-  async getPengaduanByUserId(req, res) {
+  async getComplaintByUserId(req, res) {
     try {
       const userId = req.user.id;
       const result = await pengaduan.findAll({ where: { userId: userId } });
@@ -307,10 +307,9 @@ module.exports = {
       const { gender } = req.query;
       const getComplaint = await pengaduan.findAll({ where: { gender } });
       if (getComplaint && getComplaint.length > 0) {
-        console.log(getComplaint);
         return res.status(200).json({
           status: true,
-          massage: "List Pengaduan",
+          massage: "List Pengaduan berdasarkan jenis kelamin",
           data: { complaint: getComplaint },
         });
       } else {
@@ -329,7 +328,7 @@ module.exports = {
       });
     }
   },
-  async getCasebyId(req, res) {
+  async getComplaintbyId(req, res) {
     try {
       const { id } = req.params;
       const getCase = await pengaduan.findByPk(id);
@@ -349,7 +348,7 @@ module.exports = {
       console.log(error);
       return res.status(400).json({
         status: false,
-        message: "Terjadai kesalahn pada server",
+        message: "Terjadi kesalahan pada server",
         data: { complaint: null },
       });
     }
