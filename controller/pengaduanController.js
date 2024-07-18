@@ -343,7 +343,7 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: "List Pengaduan berdasarkan id",
-        data: getCase,
+        data: { complaint: getCase },
       });
     } catch (error) {
       console.log(error);

@@ -1,13 +1,13 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { admin } = require("../models");
+const { User } = require("../models");
 const { JWT, ROLES } = require("../lib/const");
 const { pengaduan } = require("../models");
 
 module.exports = {
   async registerAdmin(req, res) {
     const { password } = req.body;
-    const admins = await admin.create({
+    const admins = await User.create({
       name: req.body.name,
       username: req.body.username,
       email: req.body.email,
@@ -25,7 +25,7 @@ module.exports = {
   async loginAdmin(req, res) {
     try {
       const { username, password } = req.body;
-      const admins = await admin.findOne({ where: { username } });
+      const admins = await User.findOne({ where: { username } });
       console.log("username :", username);
       if (!admins) {
         console.log("Belum melakukan registrasi");
@@ -47,20 +47,22 @@ module.exports = {
           data: { admins: null },
         });
         return;
+      } else {
+        const token = jwt.sign(
+          {
+            id: admins.id,
+            name: admins.name,
+            username: admins.username,
+          },
+          JWT.SECRET
+        );
+        console.log("Generate Token ", token);
+        return res.status(200).json({
+          status: true,
+          message: "Berhasil Login",
+          data: { token },
+        });
       }
-      const token = jwt.sign(
-        {
-          id: admins.id,
-          name: admins.name,
-          username: admins.username,
-        },
-        JWT.SECRET
-      );
-      console.log("Generate Token ", token);
-      return res.status(200).json({
-        message: "Berhasil Login",
-        data: { token },
-      });
     } catch (error) {
       console.log(error);
       return res.status(400).json({
@@ -73,7 +75,7 @@ module.exports = {
   async updateAdmin(req, res) {
     try {
       const { id } = req.params;
-      const getAdmin = await admin.findByPk(id);
+      const getAdmin = await User.findByPk(id);
       console.log("Admin Sekarang: ", getAdmin);
       if (!getAdmin) {
         return res.status(404).json({
