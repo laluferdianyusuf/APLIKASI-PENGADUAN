@@ -2,7 +2,6 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const authController = require("./controller/authController");
 const adminController = require("./controller/adminController");
 const middleware = require("./middleware/auth");
 const pengaduanController = require("./controller/pengaduanController");
@@ -20,17 +19,16 @@ app.get("/", (req, res) => {
   });
 });
 
-// Admin
-app.get("/admin", middleware.authenticate, userController.listUser);
-app.post("/admin/register", adminController.registerAdmin);
-app.post("/admin/login", adminController.loginAdmin);
+// CRUD Admin
+app.post("/admin/register", userController.registerAdmin);
+app.post("/admin/login", userController.loginAdmin);
 app.put(
   "/admin/update/:id",
   middleware.authenticate,
-  adminController.updateAdmin
+  userController.updateAdmin
 );
-app.put("/admin/update/complaint/:id", adminController.complaintUpdate);
-app.put("/admin/done/complaint/:id", adminController.complaintDone);
+app.put("/admin/update/complaint/:id", userController.adminUpdateComplaint);
+app.put("/admin/done/complaint/:id", userController.adminComplaintDone);
 
 // CRUD user
 app.post("/register/user", userController.registerUser);
@@ -41,13 +39,9 @@ app.delete(
   middleware.authenticate,
   userController.deleteUser
 );
-app.get("/getAll/user", userController.listUser);
-app.get("/getUserById/user/:id", userController.getUserById);
-app.get(
-  "/getCurrent/user",
-  middleware.authenticate,
-  userController.currentUser
-);
+app.get("/listUser", userController.listUser);
+app.get("/user/:id", userController.getUserById);
+app.get("/current/user", middleware.authenticate, userController.currentUser);
 
 // Complaint form user / CRUD items
 app.post(
@@ -66,15 +60,15 @@ app.delete(
   middleware.authenticate,
   pengaduanController.deletePengaduan
 );
-app.get("/getAll", pengaduanController.getAllCase);
+app.get("/listCase", pengaduanController.listComplaint);
 app.get("/getCase", pengaduanController.getPengaduan);
 app.get(
-  "/getCaseByUserId",
+  "/CaseByUserId",
   middleware.authenticate,
-  pengaduanController.getPengaduanByUserId
+  pengaduanController.getComplaintByUserId
 );
-app.get("/getGender", pengaduanController.getGender);
-app.get("/getCase/:id", pengaduanController.getCasebyId);
+app.get("/gender", pengaduanController.getGender);
+app.get("/case/:id", pengaduanController.getComplaintbyId);
 
 // complaint form Admin
 
