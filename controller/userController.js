@@ -8,7 +8,22 @@ const { User } = require("../models");
 module.exports = {
   async registerUser(req, res) {
     try {
-      const { password } = req.body;
+      const { password, email } = req.body;
+      if (password.length < 8) {
+        return res.status(401).json({
+          status: false,
+          message: "Password minimal 8 karakter",
+          data: null,
+        });
+      }
+      const existingEmail = await User.findOne({ where: { email } });
+      if (existingEmail) {
+        return res.status(402).json({
+          status: false,
+          message: "Email sudah didaftarkan",
+          data: null,
+        });
+      }
       const user = await User.create({
         name: req.body.name,
         username: req.body.username,
@@ -18,12 +33,19 @@ module.exports = {
         password: await bcrypt.hash(password, JWT.SALT_ROUND),
         role: ROLES.USER,
       });
-      res.status(201).json({
-        status: "Ok",
-        message: "Succesfully Register User",
-        data: user,
+      return res.status(200).json({
+        status: true,
+        message: "Berhasil melakukan registrasi",
+        data: { user },
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        status: false,
+        message: "Gagal melakukan registrasi",
+        data: null,
+      });
+    }
   },
   async loginUser(req, res) {
     try {
@@ -31,48 +53,68 @@ module.exports = {
       const user = await User.findOne({ where: { username } });
       console.log("username :", username);
       if (!user) {
-        console.log("Email Tak Sama");
-        res.status(404).json({
-          message: "Can't find that account",
+        console.log("Belum melakukan registrasi");
+        res.status(401).json({
+          status: false,
+          message: "Akun tidak di temukan ",
+          data: null,
         });
+        return;
       }
       const isPasswordCorrect = bcrypt.compareSync(password, user.password);
       console.log(isPasswordCorrect);
 
       if (!isPasswordCorrect) {
         console.log("Password Tak Sama ");
-        req.json({
-          message: "Can't find that Account",
+        res.status(402).json({
+          status: false,
+          message: "Akun tidak di temukan ",
+          data: null,
         });
         return;
       }
       const token = jwt.sign(
         {
-          id: User.id,
-          name: User.name,
+          id: user.id,
+          name: user.name,
+          username: user.username,
         },
         JWT.SECRET
       );
       console.log("Generate Token ", token);
       return res.status(200).json({
+        status: true,
         message: "Berhasil Login",
-        data: token,
+        data: { token },
       });
     } catch (error) {
       console.log(error);
+      return res.status(400).json({
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: null,
+      });
     }
+  },
+  async currentUser(req, res) {
+    const currentUser = req.user;
+    return res.status(200).json({
+      status: true,
+      message: "Mendapatkan User",
+      data: { currentUser },
+    });
   },
   async updateUser(req, res) {
     try {
-      const token = req.tokenPayload;
-      const id = token.id;
-      const getUser = await User.findOne({ where: { id } });
+      const { id } = req.params;
+      const getUser = await User.findByPk(id);
       console.log("Current User : ", getUser);
 
       if (!getUser) {
         return res.status(404).json({
           status: false,
-          message: "Can't update user",
+          message: "Gagal melakukan update",
+          data: null,
         });
       }
       const { name, username, email, phoneNumber, address } = req.body;
@@ -84,16 +126,17 @@ module.exports = {
         address,
       });
       console.log("Updated User : ", updateUser);
-      res.status(200).json({
-        status: "OK",
-        message: "User Successfuly Updated",
-        data: updateUser,
+      return res.status(200).json({
+        status: true,
+        message: "Berhasil melakukan update",
+        data: { updateUser },
       });
     } catch (error) {
       console.log(error);
-      res.status(400).json({
+      return res.status(400).json({
         status: false,
-        message: "Failed at update user",
+        message: "Gagal melakukan update",
+        data: null,
       });
     }
   },
@@ -102,33 +145,40 @@ module.exports = {
       const { id } = req.params;
       const result = await User.destroy({ where: { id } });
       if (!result) {
-        res.status(404).json({
+        return res.status(404).json({
           status: false,
-          message: "User not found",
+          message: "User Tidak ditemukan",
+          data: null,
         });
       }
-      res.status(200).json({
-        message: "User Successfuly Deleted",
+      return res.status(200).json({
+        status: true,
+        message: "Akun berhasil dihapus",
+        data: { result },
       });
     } catch (error) {
       console.log(error);
       res.status(400).json({
         status: false,
-        message: "Something when wrong with the server",
+        message: "Terjadi kesalahan pada server",
+        data: null,
       });
     }
   },
-  async getAllUser(req, res) {
+  async listUser(req, res) {
     try {
       const user = await User.findAll();
       return res.status(200).json({
-        status: "OK",
-        data: user,
+        status: true,
+        message: "List user",
+        data: { user },
       });
     } catch (error) {
       console.log(error);
       return res.status(400).json({
-        message: "Cannot get all users",
+        status: false,
+        message: "Gagal mendapatkan semua user",
+        data: null,
       });
     }
   },
@@ -138,32 +188,25 @@ module.exports = {
       const user = await User.findByPk(id);
       if (!user) {
         return res.status(404).json({
-          message: "User Not Found",
+          status: false,
+          message: "User tidak ditemukan",
+          data: null,
         });
       }
       if (user) {
         return res.status(200).json({
-          data: user,
+          status: true,
+          message: "Berhasil mendapatkan user",
+          data: { user },
         });
       }
     } catch (error) {
       console.log(error);
       return res.status(400).json({
-        message: "Something when wrong with the server",
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: null,
       });
     }
-    // const getUser = await User.findOne({ where: { username } });
-    // return getUser;
   },
-  // async getByEmail(req, res) {
-  //   const { email } = req.params;
-  //   const getUser = await User.findOne({ where: { email: email } });
-  //   if (!getUser) {
-  //     res.status(401).json({
-  //       status: false,
-  //       message: "Cannot get Users",
-  //     });
-  //   }
-  //   return getUser;
-  // },
 };
