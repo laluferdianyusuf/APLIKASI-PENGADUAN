@@ -19,7 +19,7 @@ module.exports = {
     try {
       const { username } = jwt.verify(token, JWT.SECRET);
       console.log("username : ", username);
-      const getUser = await User.findOne({ username });
+      const getUser = await User.findOne({ where: { username:username } });
       if (!getUser) {
         return res.status(401).json({
           status: false,
