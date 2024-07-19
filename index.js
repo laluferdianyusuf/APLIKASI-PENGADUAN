@@ -39,7 +39,7 @@ app.delete(
   middleware.authenticate,
   userController.deleteUser
 );
-app.get("/listUser", userController.listUser);
+app.get("/list/user", userController.listUser);
 app.get("/user/:id", userController.getUserById);
 app.get("/current/user", middleware.authenticate, userController.currentUser);
 
@@ -60,10 +60,10 @@ app.delete(
   middleware.authenticate,
   pengaduanController.deletePengaduan
 );
-app.get("/listCase", pengaduanController.listComplaint);
+app.get("/list/case", pengaduanController.listComplaint);
 app.get("/getCase", pengaduanController.getPengaduan);
 app.get(
-  "/CaseByUserId",
+  "/case/user/id",
   middleware.authenticate,
   pengaduanController.getComplaintByUserId
 );
