@@ -346,15 +346,16 @@ module.exports = {
           message: "Pengaduan tidak ditemukan",
           data: { admin: null },
         });
+      } else {
+        const updatePengaduan = await getPengaduan.update({
+          status: "Sedang diproses",
+        });
+        return res.status(200).json({
+          status: true,
+          message: "Status pengaduan diperbarui ke 'sedang diproses'",
+          data: { admin: updatePengaduan },
+        });
       }
-      const updatePengaduan = await getPengaduan.update({
-        status: "Sedang diproses",
-      });
-      return res.status(200).json({
-        status: true,
-        message: "Status pengaduan diperbarui ke 'sedang diproses'",
-        data: { admin: updatePengaduan },
-      });
     } catch (error) {
       console.log(error);
       res.status(400).json({
