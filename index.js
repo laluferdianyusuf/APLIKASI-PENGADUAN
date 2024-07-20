@@ -27,7 +27,12 @@ app.put(
   middleware.authenticate,
   userController.updateAdmin
 );
-app.put("/admin/update/complaint/:id", userController.adminUpdateComplaint);
+app.put(
+  "/admin/update/complaint/:id",
+  middleware.authenticate,
+  middleware.roles,
+  userController.adminUpdateComplaint
+);
 app.put("/admin/done/complaint/:id", userController.adminComplaintDone);
 
 // CRUD user

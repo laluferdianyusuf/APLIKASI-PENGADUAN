@@ -39,7 +39,7 @@ module.exports = {
     }
   },
   async isSuperAdmin(req, res, next) {
-    const admins = req.admin; // asumsikan bahwa pengguna telah diautentikasi dan objek pengguna telah disimpan di req.user
+    const admins = req.user;
 
     if (admins && admins.role === ROLES.SUPERADMIN) {
       return next();
@@ -51,7 +51,7 @@ module.exports = {
     });
   },
   async roles(req, res, next) {
-    const admins = req.admin;
+    const admins = req.user;
 
     if (admins.role === ROLES.SUPERADMIN || admins.role === ROLES.ADMIN) {
       return next();
