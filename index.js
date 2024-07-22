@@ -6,6 +6,7 @@ const adminController = require("./controller/adminController");
 const middleware = require("./middleware/auth");
 const pengaduanController = require("./controller/pengaduanController");
 const userController = require("./controller/userController");
+const notifikasiController = require("./controller/notifikasiController");
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -66,16 +67,47 @@ app.delete(
   pengaduanController.deletePengaduan
 );
 app.get("/list/case", pengaduanController.listComplaint);
-app.get("/getCase", pengaduanController.getPengaduan);
+app.get("/getCase", pengaduanController.getCaseViolence);
 app.get(
-  "/case/user/id",
+  "/case/wait/user/id",
   middleware.authenticate,
-  pengaduanController.getComplaintByUserId
+  pengaduanController.getWaitComplaintByUserId
+);
+app.get(
+  "/case/proccess/user/id",
+  middleware.authenticate,
+  pengaduanController.getProccessComplaintByUserId
+);
+app.get(
+  "/case/done/user/id",
+  middleware.authenticate,
+  pengaduanController.getDoneComplaintByUserId
 );
 app.get("/gender", pengaduanController.getGender);
 app.get("/case/:id", pengaduanController.getComplaintbyId);
+app.get(
+  "complaint/update/status",
+  middleware.roles,
+  pengaduanController.getComplaintUpdate
+);
+app.get(
+  "complaint/done/status",
+  middleware.roles,
+  pengaduanController.getComplaintDone
+);
 
-// complaint form Admin
+// complaint notifikasi
+// app.post(
+//   "/notif/admin",
+//   middleware.authenticate,
+//   pengaduanController.sendNotif
+// );
+// app.post(
+//   "/notification/create",
+//   middleware.authenticate,
+//   middleware.fireb,
+//   notifikasiController.createNotifComplaint
+// );
 
 app.use(express.json());
 app.listen(process.env.PORT || 5000, function () {
