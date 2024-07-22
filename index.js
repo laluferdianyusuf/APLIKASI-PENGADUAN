@@ -33,7 +33,12 @@ app.put(
   middleware.roles,
   userController.adminUpdateComplaint
 );
-app.put("/admin/done/complaint/:id", userController.adminComplaintDone);
+app.put(
+  "/admin/done/complaint/:id",
+  middleware.authenticate,
+  middleware.roles,
+  userController.adminComplaintDone
+);
 
 // CRUD user
 app.post("/register/user", userController.registerUser);
