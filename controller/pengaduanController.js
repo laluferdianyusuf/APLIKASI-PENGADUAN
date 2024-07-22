@@ -1,6 +1,8 @@
 const { where } = require("sequelize");
+const nodeMailer = require("nodemailer");
 const { pengaduan } = require("../models");
-
+const { User } = require("../models");
+const { JWT, ROLES } = require("../lib/const");
 module.exports = {
   async complaintClient(req, res) {
     try {
@@ -246,7 +248,7 @@ module.exports = {
       });
     }
   },
-  async getPengaduan(req, res) {
+  async getCaseViolence(req, res) {
     try {
       const { caseViolence } = req.query;
       const getComplaint = await pengaduan.findAll({
@@ -275,10 +277,102 @@ module.exports = {
       });
     }
   },
-  async getComplaintByUserId(req, res) {
+  async getCaseByEducation(req, res) {
+    try {
+      const { education } = req.query;
+      const getComplaint = await pengaduan.findAll({
+        where: { education },
+      });
+      if (getComplaint && getComplaint.length > 0) {
+        console.log(getComplaint);
+        return res.status(200).json({
+          status: true,
+          massage: "List Pengaduan berdasarkan jenis kekerasan",
+          data: { complaint: getComplaint },
+        });
+      } else {
+        return res.status(404).json({
+          status: false,
+          massage: "List Pengaduan tidak ditemukan",
+          data: { complaint: null },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        status: false,
+        massage: "Unauthorize Access",
+        data: { complaint: null },
+      });
+    }
+  },
+  async getWaitComplaintByUserId(req, res) {
     try {
       const userId = req.user.id;
-      const result = await pengaduan.findAll({ where: { userId: userId } });
+      const status = "Menunggu konfirmasi";
+      const result = await pengaduan.findAll({
+        where: { userId: userId, status: status },
+      });
+      if (!result) {
+        return res.status(404).json({
+          status: false,
+          message: "Kasus tidak ditemukan",
+          data: { complaint: null },
+        });
+      }
+      if (result) {
+        return res.status(200).json({
+          status: true,
+          message: "Berhasil mendapatkan pengaduan",
+          data: { complaint: result },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: { complaint: null },
+      });
+    }
+  },
+  async getProccessComplaintByUserId(req, res) {
+    try {
+      const userId = req.user.id;
+      const status = "Sedang diproses";
+      const result = await pengaduan.findAll({
+        where: { userId: userId, status: status },
+      });
+      if (!result) {
+        return res.status(404).json({
+          status: false,
+          message: "Kasus tidak ditemukan",
+          data: { complaint: null },
+        });
+      }
+      if (result) {
+        return res.status(200).json({
+          status: true,
+          message: "Berhasil mendapatkan pengaduan",
+          data: { complaint: result },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: { complaint: null },
+      });
+    }
+  },
+  async getDoneComplaintByUserId(req, res) {
+    try {
+      const userId = req.user.id;
+      const status = "Kasus Telah Selesai";
+      const result = await pengaduan.findAll({
+        where: { userId: userId, status: status },
+      });
       if (!result) {
         return res.status(404).json({
           status: false,
@@ -350,6 +444,97 @@ module.exports = {
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { complaint: null },
+      });
+    }
+  },
+  async getComplaintUpdate(req, res) {
+    try {
+      const status = "Sedang diproses";
+      const getComplaint = await pengaduan.findOne({ where: { status } });
+      console.log(getComplaint);
+
+      if (!getComplaint) {
+        return res.status(401).json({
+          status: false,
+          message: "Pengaduan tidak ditemukan",
+          data: { complaint: getComplaint },
+        });
+      }
+      return res.status(200).json({
+        status: true,
+        message: "List Pengaduan",
+        data: { complaint: getComplaint },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: { user: null },
+      });
+    }
+  },
+  async getComplaintDone(req, res) {
+    try {
+      const status = "Kasus Telah Selesai";
+      const getComplaint = await pengaduan.findOne({ where: { status } });
+      console.log(getComplaint);
+
+      if (!getComplaint) {
+        return res.status(401).json({
+          status: false,
+          message: "Pengaduan tidak ditemukan",
+          data: { complaint: getComplaint },
+        });
+      }
+      return res.status(200).json({
+        status: true,
+        message: "List Pengaduan",
+        data: { complaint: getComplaint },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: { user: null },
+      });
+    }
+  },
+  async sendNotif(req, res) {
+    try {
+      const email = req.user.email;
+      const sendComplaint = await User.findOne({
+        where: { role: ROLES.ADMIN },
+      });
+      const transporter = nodeMailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "laluoki66@gmail.com",
+          pass: "luhung21",
+        },
+      });
+      console.log(sendComplaint);
+      const mailOption = {
+        from: email,
+        to: sendComplaint.email,
+        subject: "Laporan Pengaduan dari Mitra",
+        text: "lorem ipsum",
+      };
+      await transporter.sendMail(mailOption);
+      if (sendNotif) {
+        return res.status(200).json({
+          status: true,
+          message: "Berhasil mengirimkan notifikasi ke admin",
+          data: { notif: sendNotif },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: { notif: null },
       });
     }
   },
