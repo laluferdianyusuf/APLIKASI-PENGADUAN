@@ -1,5 +1,5 @@
 const { where } = require("sequelize");
-// const nodeMailer = require("nodemailer");
+const nodeMailer = require("nodemailer");
 const { pengaduan } = require("../models");
 const { User } = require("../models");
 const { JWT, ROLES } = require("../lib/const");
