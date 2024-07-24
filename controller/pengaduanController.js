@@ -7,7 +7,7 @@ module.exports = {
   async complaintClient(req, res) {
     try {
       const user_id = req.user.id;
-      const sendComplaint = await User.findOne({
+      const sendComplaint = await User.findAll({
         where: { role: ROLES.ADMIN },
       });
       const transporter = nodeMailer.createTransport({
@@ -17,8 +17,7 @@ module.exports = {
           pass: "nkex bofk zujl ajwy",
         },
       });
-      console.log(transporter);
-      console.log(user_id);
+
       const {
         name,
         born,
@@ -39,7 +38,6 @@ module.exports = {
         economy,
         chronology,
       } = req.body;
-      console.log(caseViolence);
       if (caseViolence == "fisik" && !physical) {
         return res.status(200).json({
           status: true,
@@ -68,9 +66,10 @@ module.exports = {
           data: { complaint: null },
         });
       }
+      const emailAddresses = sendComplaint.map((user) => user.email);
       const mailOption = {
         from: "appcom2024@gmail.com",
-        to: sendComplaint.email,
+        to: emailAddresses,
         subject: "Laporan Pengaduan dari Mitra",
         html:
           '<p>Silahkan lihat lengkap laporan pengaduan <a href="https://play.google.com/store/apps/details?id=com.tokopedia.tkpd' +

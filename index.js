@@ -101,30 +101,6 @@ app.get(
   middleware.roles,
   pengaduanController.getComplaintDone
 );
-app.get(
-  "case/without",
-  middleware.authenticate,
-  middleware.roles,
-  pengaduanController.getProcessCase
-);
-app.get(
-  "/case/wait/process",
-  middleware.authenticate,
-  pengaduanController.getProcessCase
-);
-
-// complaint notifikasi
-// app.post(
-//   "/notif/admin",
-//   middleware.authenticate,
-//   pengaduanController.sendNotif
-// );
-// app.post(
-//   "/notification/create",
-//   middleware.authenticate,
-//   middleware.fireb,
-//   notifikasiController.createNotifComplaint
-// );
 
 app.use(express.json());
 app.listen(process.env.PORT || 5000, function () {
