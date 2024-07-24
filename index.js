@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const middleware = require("./middleware/auth");
 const pengaduanController = require("./controller/pengaduanController");
 const userController = require("./controller/userController");
+const infoController = require("./controller/infoController");
 // const notifikasiController = require("./controller/notifikasiController");
 const app = express();
 
@@ -101,6 +102,36 @@ app.get(
   middleware.roles,
   pengaduanController.getComplaintDone
 );
+// app.get(
+//   "case/without",
+//   middleware.authenticate,
+//   middleware.roles,
+//   pengaduanController.getProcessCase
+// );
+// app.get(
+//   "/case/wait/process",
+//   middleware.authenticate,
+//   pengaduanController.getProcessCase
+// );
+
+// CRUD Informasi
+app.post("/create/info", infoController.createInfo);
+app.put("/update/Info", infoController.updateInfo);
+app.delete("/deleted/Info", infoController.deleteInfo);
+app.get("/list/Info", infoController.listInfo);
+
+// complaint notifikasi
+// app.post(
+//   "/notif/admin",
+//   middleware.authenticate,
+//   pengaduanController.sendNotif
+// );
+// app.post(
+//   "/notification/create",
+//   middleware.authenticate,
+//   middleware.fireb,
+//   notifikasiController.createNotifComplaint
+// );
 
 app.use(express.json());
 app.listen(process.env.PORT || 5000, function () {
