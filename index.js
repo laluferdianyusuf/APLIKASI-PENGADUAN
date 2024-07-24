@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const adminController = require("./controller/adminController");
+// const adminController = require("./controller/adminController");
 const middleware = require("./middleware/auth");
 const pengaduanController = require("./controller/pengaduanController");
 const userController = require("./controller/userController");
@@ -72,23 +72,24 @@ app.delete(
   pengaduanController.deletePengaduan
 );
 app.get("/list/case", pengaduanController.listComplaint);
-app.get("/getCase", pengaduanController.getCaseViolence);
+app.get("/case/violence", pengaduanController.getCaseViolence);
+app.get("/case/gender", pengaduanController.getGender);
+app.get("/case/education", pengaduanController.getCaseByEducation);
 app.get(
-  "/case/wait/user/id",
+  "/case/wait/admin/id",
   middleware.authenticate,
   pengaduanController.getWaitComplaintByUserId
 );
 app.get(
-  "/case/proccess/user/id",
+  "/case/proccess/admin/id",
   middleware.authenticate,
   pengaduanController.getProccessComplaintByUserId
 );
 app.get(
-  "/case/done/user/id",
+  "/case/done/admin/id",
   middleware.authenticate,
   pengaduanController.getDoneComplaintByUserId
 );
-app.get("/gender", pengaduanController.getGender);
 app.get("/case/:id", pengaduanController.getComplaintbyId);
 app.get(
   "complaint/update/status",
@@ -99,6 +100,17 @@ app.get(
   "complaint/done/status",
   middleware.roles,
   pengaduanController.getComplaintDone
+);
+app.get(
+  "case/without",
+  middleware.authenticate,
+  middleware.roles,
+  pengaduanController.getProcessCase
+);
+app.get(
+  "/case/wait/process",
+  middleware.authenticate,
+  pengaduanController.getProcessCase
 );
 
 // complaint notifikasi

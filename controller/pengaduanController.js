@@ -7,6 +7,17 @@ module.exports = {
   async complaintClient(req, res) {
     try {
       const user_id = req.user.id;
+      const sendComplaint = await User.findOne({
+        where: { role: ROLES.ADMIN },
+      });
+      const transporter = nodeMailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "appcom2024@gmail.com",
+          pass: "nkex bofk zujl ajwy",
+        },
+      });
+      console.log(transporter);
       console.log(user_id);
       const {
         name,
@@ -57,6 +68,14 @@ module.exports = {
           data: { complaint: null },
         });
       }
+      const mailOption = {
+        from: "appcom2024@gmail.com",
+        to: sendComplaint.email,
+        subject: "Laporan Pengaduan dari Mitra",
+        html:
+          '<p>Silahkan lihat lengkap laporan pengaduan <a href="https://play.google.com/store/apps/details?id=com.tokopedia.tkpd' +
+          '">link</a> Masuk ke aplikasi</p>',
+      };
       const createPengaduan = await pengaduan.create({
         userid: user_id,
         name,
@@ -79,11 +98,14 @@ module.exports = {
         chronology,
         status: "Menunggu konfirmasi",
       });
-      return res.status(200).json({
-        status: true,
-        message: "Berhasil Membuat Pengaduan",
-        data: { complaint: createPengaduan },
-      });
+      if (createPengaduan) {
+        await transporter.sendMail(mailOption);
+        return res.status(200).json({
+          status: true,
+          message: "Berhasil Membuat Pengaduan",
+          data: { complaint: createPengaduan },
+        });
+      }
     } catch (error) {
       console.error(error);
       return res.status(400).json({
@@ -276,6 +298,32 @@ module.exports = {
       });
     }
   },
+  async getGender(req, res) {
+    try {
+      const { gender } = req.query;
+      const getComplaint = await pengaduan.findAll({ where: { gender } });
+      if (getComplaint && getComplaint.length > 0) {
+        return res.status(200).json({
+          status: true,
+          massage: "List Pengaduan berdasarkan jenis kelamin",
+          data: { complaint: getComplaint },
+        });
+      } else {
+        return res.status(404).json({
+          status: false,
+          massage: "List Pengaduan Tidak di temukan",
+          data: { complaint: null },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        status: false,
+        massage: "Unauthorize Access",
+        data: { complaint: null },
+      });
+    }
+  },
   async getCaseByEducation(req, res) {
     try {
       const { education } = req.query;
@@ -286,7 +334,7 @@ module.exports = {
         console.log(getComplaint);
         return res.status(200).json({
           status: true,
-          massage: "List Pengaduan berdasarkan jenis kekerasan",
+          massage: "List Pengaduan berdasarkan jenjang pendidikan",
           data: { complaint: getComplaint },
         });
       } else {
@@ -423,7 +471,6 @@ module.exports = {
       });
     }
   },
-
   async getGender(req, res) {
     try {
       const { gender } = req.query;
@@ -529,41 +576,32 @@ module.exports = {
       });
     }
   },
-  async sendNotif(req, res) {
-    try {
-      const email = req.user.email;
-      const sendComplaint = await User.findOne({
-        where: { role: ROLES.ADMIN },
-      });
-      const transporter = nodeMailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: "laluoki66@gmail.com",
-          pass: "luhung21",
-        },
-      });
-      console.log(sendComplaint);
-      const mailOption = {
-        from: email,
-        to: sendComplaint.email,
-        subject: "Laporan Pengaduan dari Mitra",
-        text: "lorem ipsum",
-      };
-      await transporter.sendMail(mailOption);
-      if (sendNotif) {
-        return res.status(200).json({
-          status: true,
-          message: "Berhasil mengirimkan notifikasi ke admin",
-          data: { notif: sendNotif },
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({
-        status: false,
-        message: "Terjadi kesalahan pada server",
-        data: { notif: null },
-      });
-    }
-  },
+  // method buat mendapatkan semua case selain kasus yang telah selesai
+  // async getProcessCase(req, res) {
+  //   try {
+  //     const status = ["Menunggu konfirmasi", "Sedang diproses"];
+  //     const getStatus = await pengaduan.findAll({ where: { status: status } });
+  //     if (!getStatus) {
+  //       return res.status(401).json({
+  //         status: false,
+  //         message: "Tidak dapat menemukan kasus",
+  //         date: { complaint: null },
+  //       });
+  //     }
+  //     if (getStatus) {
+  //       return res.status(200).json({
+  //         status: true,
+  //         message: "List status Kasus",
+  //         data: { complaint: getStatus },
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     return res.status(500).json({
+  //       status: false,
+  //       message: "Terjadi kesalahan pada server",
+  //       data: { complaint: null },
+  //     });
+  //   }
+  // },
 };
