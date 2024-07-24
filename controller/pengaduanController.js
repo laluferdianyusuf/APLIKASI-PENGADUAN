@@ -1,5 +1,5 @@
 const { where } = require("sequelize");
-const nodeMailer = require("nodemailer");
+// const nodeMailer = require("nodemailer");
 const { pengaduan } = require("../models");
 const { User } = require("../models");
 const { JWT, ROLES } = require("../lib/const");
@@ -226,7 +226,6 @@ module.exports = {
     try {
       const getComplaint = await pengaduan.findAll();
       if (getComplaint) {
-        console.log(getComplaint);
         return res.status(200).json({
           status: true,
           massage: "List Pengaduan",
@@ -306,25 +305,35 @@ module.exports = {
       });
     }
   },
+
   async getWaitComplaintByUserId(req, res) {
     try {
       const userId = req.user.id;
-      const status = "Menunggu konfirmasi";
-      const result = await pengaduan.findAll({
-        where: { userId: userId, status: status },
-      });
-      if (!result) {
+      const status = "Menunggu Konfirmasi";
+      const role = req.user.role;
+
+      let results;
+
+      if (role === "Admin" || role === "superadmin") {
+        results = await pengaduan.findAll({ where: { status: status } });
+      } else {
+        results = await pengaduan.findAll({
+          where: { status: status, userId: userId },
+        });
+      }
+
+      if (!results) {
         return res.status(404).json({
           status: false,
           message: "Kasus tidak ditemukan",
           data: { complaint: null },
         });
       }
-      if (result) {
+      if (results) {
         return res.status(200).json({
           status: true,
           message: "Berhasil mendapatkan pengaduan",
-          data: { complaint: result },
+          data: { complaint: results },
         });
       }
     } catch (error) {
@@ -340,21 +349,30 @@ module.exports = {
     try {
       const userId = req.user.id;
       const status = "Sedang diproses";
-      const result = await pengaduan.findAll({
-        where: { userId: userId, status: status },
-      });
-      if (!result) {
+      const role = req.user.role;
+
+      let results;
+
+      if (role === "Admin" || role === "superadmin") {
+        results = await pengaduan.findAll({ where: { status: status } });
+      } else {
+        results = await pengaduan.findAll({
+          where: { status: status, userId: userId },
+        });
+      }
+
+      if (!results) {
         return res.status(404).json({
           status: false,
           message: "Kasus tidak ditemukan",
           data: { complaint: null },
         });
       }
-      if (result) {
+      if (results) {
         return res.status(200).json({
           status: true,
           message: "Berhasil mendapatkan pengaduan",
-          data: { complaint: result },
+          data: { complaint: results },
         });
       }
     } catch (error) {
@@ -370,21 +388,30 @@ module.exports = {
     try {
       const userId = req.user.id;
       const status = "Kasus Telah Selesai";
-      const result = await pengaduan.findAll({
-        where: { userId: userId, status: status },
-      });
-      if (!result) {
+      const role = req.user.role;
+
+      let results;
+
+      if (role === "Admin" || role === "superadmin") {
+        results = await pengaduan.findAll({ where: { status: status } });
+      } else {
+        results = await pengaduan.findAll({
+          where: { status: status, userId: userId },
+        });
+      }
+
+      if (!results) {
         return res.status(404).json({
           status: false,
           message: "Kasus tidak ditemukan",
           data: { complaint: null },
         });
       }
-      if (result) {
+      if (results) {
         return res.status(200).json({
           status: true,
           message: "Berhasil mendapatkan pengaduan",
-          data: { complaint: result },
+          data: { complaint: results },
         });
       }
     } catch (error) {
@@ -396,6 +423,7 @@ module.exports = {
       });
     }
   },
+
   async getGender(req, res) {
     try {
       const { gender } = req.query;

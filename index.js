@@ -6,7 +6,7 @@ const adminController = require("./controller/adminController");
 const middleware = require("./middleware/auth");
 const pengaduanController = require("./controller/pengaduanController");
 const userController = require("./controller/userController");
-const notifikasiController = require("./controller/notifikasiController");
+// const notifikasiController = require("./controller/notifikasiController");
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
