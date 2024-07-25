@@ -270,16 +270,38 @@ module.exports = {
   },
   async getCaseViolence(req, res) {
     try {
-      const { caseViolence } = req.query;
-      const getComplaint = await pengaduan.findAll({
-        where: { caseViolence },
+      const getComplaint = await pengaduan.findAll({});
+
+      let violenceCount = {
+        physical: 0,
+        sexual: 0,
+        psychology: 0,
+        economy: 0,
+      };
+
+      getComplaint.forEach((complaint) => {
+        switch (complaint.caseViolence) {
+          case "physical":
+            violenceCount.physical++;
+            break;
+          case "sexual":
+            violenceCount.sexual++;
+            break;
+          case "psychology":
+            violenceCount.psychology++;
+            break;
+          case "economy":
+            violenceCount.economy++;
+            break;
+          default:
+            break;
+        }
       });
       if (getComplaint && getComplaint.length > 0) {
-        console.log(getComplaint);
         return res.status(200).json({
           status: true,
           massage: "List Pengaduan berdasarkan jenis kekerasan",
-          data: { complaint: getComplaint },
+          data: { complaint: violenceCount },
         });
       } else {
         return res.status(404).json({
@@ -299,42 +321,86 @@ module.exports = {
   },
   async getGender(req, res) {
     try {
-      const { gender } = req.query;
-      const getComplaint = await pengaduan.findAll({ where: { gender } });
-      if (getComplaint && getComplaint.length > 0) {
+      const getComplaint = await pengaduan.findAll({});
+      console.log(getComplaint.length);
+
+      let genderCount = { male: 0, female: 0 };
+
+      getComplaint.forEach((complaint) => {
+        switch (complaint.gender.toLowerCase()) {
+          case "laki - laki":
+          case "laki-laki": // Ensure consistent handling of possible variations
+            genderCount.male++;
+            break;
+          case "perempuan":
+            genderCount.female++;
+            break;
+          default:
+            break;
+        }
+      });
+
+      if (getComplaint.length > 0) {
         return res.status(200).json({
           status: true,
-          massage: "List Pengaduan berdasarkan jenis kelamin",
-          data: { complaint: getComplaint },
+          message: "List Pengaduan berdasarkan jenis kelamin",
+          data: { complaint: genderCount },
         });
       } else {
         return res.status(404).json({
           status: false,
-          massage: "List Pengaduan Tidak di temukan",
-          data: { complaint: null },
+          message: "List Pengaduan tidak ditemukan",
+          data: null,
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return res.status(400).json({
         status: false,
-        message: "Terjadi kesalahan pada server",
-        data: { complaint: null },
+        message: "Unauthorized Access",
+        error: error.message,
       });
     }
   },
   async getCaseByEducation(req, res) {
     try {
-      const { education } = req.query;
-      const getComplaint = await pengaduan.findAll({
-        where: { education },
+      const getComplaint = await pengaduan.findAll({});
+
+      let complaintCounts = {
+        TK: 0,
+        SD: 0,
+        SMP: 0,
+        SMA: 0,
+        PerguruanTinggi: 0,
+      };
+
+      getComplaint.forEach((complaint) => {
+        switch (complaint.education) {
+          case "TK":
+            complaintCounts.TK++;
+            break;
+          case "SD":
+            complaintCounts.SD++;
+            break;
+          case "SMP":
+            complaintCounts.SMP++;
+            break;
+          case "SMA":
+            complaintCounts.SMA++;
+            break;
+          case "Perguruan Tinggi":
+            complaintCounts.PerguruanTinggi++;
+            break;
+          default:
+            break;
+        }
       });
-      if (getComplaint && getComplaint.length > 0) {
-        console.log(getComplaint);
+
+      if (getComplaint.length > 0) {
         return res.status(200).json({
           status: true,
           message: "List Pengaduan berdasarkan jenjang pendidikan",
-          data: { complaint: getComplaint },
+          data: { complaint: complaintCounts },
         });
       } else {
         return res.status(404).json({
@@ -347,7 +413,7 @@ module.exports = {
       console.log(error);
       return res.status(500).json({
         status: false,
-        message: "Terjadi Kesalahan pada server",
+        message: "Unauthorize Access",
         data: { complaint: null },
       });
     }
@@ -470,6 +536,7 @@ module.exports = {
       });
     }
   },
+
   async getComplaintbyId(req, res) {
     try {
       const { id } = req.params;
@@ -549,32 +616,4 @@ module.exports = {
       });
     }
   },
-  // method buat mendapatkan semua case selain kasus yang telah selesai
-  // async getProcessCase(req, res) {
-  //   try {
-  //     const status = ["Menunggu konfirmasi", "Sedang diproses"];
-  //     const getStatus = await pengaduan.findAll({ where: { status: status } });
-  //     if (!getStatus) {
-  //       return res.status(401).json({
-  //         status: false,
-  //         message: "Tidak dapat menemukan kasus",
-  //         date: { complaint: null },
-  //       });
-  //     }
-  //     if (getStatus) {
-  //       return res.status(200).json({
-  //         status: true,
-  //         message: "List status Kasus",
-  //         data: { complaint: getStatus },
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     return res.status(500).json({
-  //       status: false,
-  //       message: "Terjadi kesalahan pada server",
-  //       data: { complaint: null },
-  //     });
-  //   }
-  // },
 };

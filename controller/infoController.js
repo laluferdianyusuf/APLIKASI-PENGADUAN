@@ -3,10 +3,10 @@ const { Informasi } = require("../models");
 module.exports = {
   async createInfo(req, res) {
     try {
-      const { title, description } = req.body;
+      const { title, descriptions } = req.body;
       const createInformasi = await Informasi.create({
         title,
-        description,
+        descriptions,
       });
       if (!createInformasi) {
         return res.status(401).json({
@@ -31,10 +31,10 @@ module.exports = {
   },
   async updateInfo(req, res) {
     try {
-      const { title, description } = req.body;
+      const { title, descriptions } = req.body;
       const updateInformasi = await Informasi.update({
         title,
-        description,
+        descriptions,
       });
       if (!updateInformasi) {
         return res.status(401).json({
@@ -87,25 +87,13 @@ module.exports = {
   async listInfo(req, res) {
     try {
       const listInformasi = await Informasi.findAll();
-      if (!listInformasi) {
-        return res.status(401).json({
-          status: false,
-          massage: "List Informasi Tidak ditemukan",
-          data: { informasi: null },
-        });
-      }
+
       if (listInformasi.length > 0) {
         console.log(listInformasi);
         return res.status(200).json({
           status: true,
           massage: "List Infromasi",
           data: { informasi: listInformasi },
-        });
-      } else {
-        return res.status(404).json({
-          status: false,
-          message: "Belum ada list Informasi",
-          data: { informasi: null },
         });
       }
     } catch (error) {

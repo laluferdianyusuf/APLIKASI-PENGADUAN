@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const { JWT, ROLES } = require("../lib/const");
 const { User } = require("../models");
 const { pengaduan } = require("../models");
+const { messages } = require("../models");
+const { Op } = require("sequelize");
 
 module.exports = {
   async registerAdmin(req, res) {
@@ -390,6 +392,40 @@ module.exports = {
         status: false,
         message: "Gagal melakukan pembaruan status pengaduan",
         data: { admin: null },
+      });
+    }
+  },
+  async getUserByChat(req, res) {
+    try {
+      const userId = req.user.id;
+
+      const users = await User.findAll({
+        include: [
+          {
+            model: messages,
+            as: "Messages",
+            where: {
+              [Op.or]: [{ senderId: userId }, { receiverId: userId }],
+            },
+            attributes: [], // Exclude message fields from the result
+          },
+        ],
+        distinct: true, // Ensure users are not duplicated
+      });
+
+      res.json({
+        status: true,
+        message: "success",
+        data: {
+          user: users,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching chatted users:", error);
+      res.status(500).json({
+        status: false,
+        message: "Internal Server Error",
+        data: { user: null },
       });
     }
   },
