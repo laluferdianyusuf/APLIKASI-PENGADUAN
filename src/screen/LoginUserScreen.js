@@ -11,13 +11,13 @@ import Background from "../components/Background";
 import Logo from "../components/Logo";
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
-import AdminButton from "../components/AdminButton";
 import { usernameValidator, passwordValidator } from "../helpers/validator";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../themes/theme";
+const uri = "http://192.168.1.3:5000";
 
 export default function LoginUserScreen({ navigation }) {
   const [username, setUsername] = useState({ value: "", error: "" });
@@ -25,7 +25,8 @@ export default function LoginUserScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const onLoginPressed = async () => {
+  const onLoginPressed = async (e) => {
+    e.preventDefault();
     const usernameError = usernameValidator(username.value);
     const passwordError = passwordValidator(password.value);
     if (usernameError || passwordError) {
@@ -40,12 +41,8 @@ export default function LoginUserScreen({ navigation }) {
         username: username.value,
         password: password.value,
       };
-      const request = await axios.post(
-        "http://192.168.1.4:1000/login/user",
-        loginPayload
-      );
+      const request = await axios.post(`${uri}/login/user`, loginPayload);
       const response = request.data;
-      console.log(response);
 
       setIsLoading(false);
       if (response.status) {
@@ -69,7 +66,6 @@ export default function LoginUserScreen({ navigation }) {
         });
       }
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
       Toast.show({
         type: ALERT_TYPE.DANGER,
@@ -77,10 +73,6 @@ export default function LoginUserScreen({ navigation }) {
         textBody: `${error.response.data.message}`,
       });
     }
-  };
-
-  const handleGoAdminScreen = () => {
-    navigation.navigate("LoginAdminScreen");
   };
 
   const toggleShowPassword = () => {
@@ -99,7 +91,6 @@ export default function LoginUserScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <Background>
-          <AdminButton loginAdmin={handleGoAdminScreen} />
           <Logo />
           <TextInput
             label="Username"
@@ -140,7 +131,7 @@ export default function LoginUserScreen({ navigation }) {
             onPress={onLoginPressed}
             disabled={isLoading}
           >
-            {isLoading ? "..." : "MASUK"}
+            {isLoading ? "Loading..." : "MASUK"}
           </Button>
 
           <View style={styles.registerContainer}>
@@ -156,7 +147,7 @@ export default function LoginUserScreen({ navigation }) {
             onPress={handleGoMainScreen}
             style={styles.DataLink}
           >
-            <Text className="font-bold underline" style={styles.TextStyle}>
+            <Text className="font-bold" style={styles.TextStyle}>
               Lihat Ringkasan Data
             </Text>
           </TouchableOpacity>

@@ -1,107 +1,161 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   SafeAreaView,
   ScrollView,
   View,
   Text,
   StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
   TouchableOpacity,
 } from "react-native";
-import Icon from "react-native-vector-icons/Feather";
 import { theme } from "../themes/theme";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import SearchBar from "../components/SearchBar";
+import Icon from "react-native-vector-icons/Feather";
 
-const complaintData = [
-  {
-    id: 1,
-    title: "Pengaduan 1",
-    status: "Diproses",
-    date: "01 Juli 2024",
-    description:
-      "Deskripsi lengkap untuk Pengaduan 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet.",
-  },
-  {
-    id: 2,
-    title: "Pengaduan 2",
-    status: "Selesai",
-    date: "03 Juli 2024",
-    description:
-      "Deskripsi lengkap untuk Pengaduan 2. Suspendisse potenti. In eleifend quam adipiscing odio. Suspendisse potenti. Maecenas malesuada. Duis euismod. Morbi ut mi. Nullam enim leo, egestas id, condimentum at, laoreet mattis, massa.",
-  },
-  {
-    id: 3,
-    title: "Pengaduan 3",
-    status: "Ditunda",
-    date: "05 Juli 2024",
-    description:
-      "Deskripsi lengkap untuk Pengaduan 3. Proin in tellus sit amet nibh dignissim sagittis. Nullam lorem ipsum, faucibus vel, interdum nec, mattis vitae, leo.",
-  },
-  {
-    id: 4,
-    title: "Pengaduan 4",
-    status: "Diproses",
-    date: "07 Juli 2024",
-    description:
-      "Deskripsi lengkap untuk Pengaduan 4. Praesent pede. Mauris pretium varius lacus. Nunc feugiat mi a tellus consequat imperdiet. Vestibulum sapien.",
-  },
-  {
-    id: 5,
-    title: "Pengaduan 5",
-    status: "Selesai",
-    date: "09 Juli 2024",
-    description:
-      "Deskripsi lengkap untuk Pengaduan 5. Praesent pede. Mauris pretium varius lacus. Nunc feugiat mi a tellus consequat imperdiet. Vestibulum sapien.",
-  },
-];
+const uri = "http://192.168.1.3:5000";
 
-const HistoryScreen = ({ navigation }) => {
+export default function HistoryScreen({ navigation }) {
+  const [refreshing, setRefreshing] = useState(false);
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filteredComplaints, setFilteredComplaints] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchComplaint = useCallback(async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+      const request = await axios.get(`${uri}/case/done/admin/id`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const response = request.data;
+      if (response.status) {
+        setData(response.data.complaint.reverse());
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchComplaint();
+  }, [fetchComplaint]);
+
+  useEffect(() => {
+    setFilteredComplaints(data);
+  }, [data]);
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (query) {
+      const lowerCaseQuery = query.toLowerCase();
+      const filtered = data.filter((complaint) => {
+        return (
+          complaint.name.toLowerCase().includes(lowerCaseQuery) ||
+          (complaint.createdAt &&
+            complaint.createdAt.split("T")[0].includes(lowerCaseQuery)) ||
+          complaint.chronology.toLowerCase().includes(lowerCaseQuery) ||
+          complaint.status.toLowerCase().includes(lowerCaseQuery)
+        );
+      });
+      setFilteredComplaints(filtered);
+    } else {
+      setFilteredComplaints(data);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchComplaint();
+    setRefreshing(false);
+  };
+
   const navigateToDetail = (complaintId) => {
     navigation.navigate("HistoryDetailScreen", { complaintId });
   };
 
-  if (complaintData) {
-    
-  }
+  if (isLoading)
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading...</Text>
+      </View>
+    );
+
+  if (error)
+    return (
+      <View style={styles.center}>
+        <Text>Error loading data</Text>
+      </View>
+    );
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* <SearchBar
+        placeholder="Search"
+        onChangeText={handleSearch}
+        value={searchQuery}
+        style={{ marginBottom: 10, borderRadius: 20, backgroundColor: "white" }}
+      /> */}
       <ScrollView
         contentContainerStyle={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
-        {complaintData.map((complaint) => (
-          <View key={complaint.id} style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.title}>{complaint.title}</Text>
-              <Text style={styles.status}>{complaint.status}</Text>
+        {Array.isArray(filteredComplaints) && filteredComplaints.length > 0 ? (
+          filteredComplaints.map((complaint) => (
+            <View key={complaint.id} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.title}>{complaint.name}</Text>
+                <Text style={styles.status}>{complaint.status}</Text>
+              </View>
+              <View style={styles.cardBody}>
+                <Text style={styles.date}>{`Tanggal: ${
+                  complaint.createdAt.split("T")[0]
+                }`}</Text>
+                <Text
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                  style={styles.description}
+                >
+                  {complaint.chronology}
+                </Text>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() => navigateToDetail(complaint.id)}
+                >
+                  <Text style={styles.detailButtonText}>
+                    Lihat Detail Kasus
+                  </Text>
+                  <Icon
+                    name="arrow-right"
+                    size={16}
+                    color={theme.colors.purple400}
+                    style={styles.detailButtonIcon}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.cardBody}>
-              <Text style={styles.date}>{`Tanggal: ${complaint.date}`}</Text>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={styles.description}
-              >
-                {complaint.description}
-              </Text>
-              <TouchableOpacity
-                style={styles.detailButton}
-                onPress={() => navigateToDetail(complaint.id)}
-              >
-                <Text style={styles.detailButtonText}>Lihat Detail Kasus</Text>
-                <Icon
-                  name="arrow-right"
-                  size={16}
-                  color={theme.colors.purple400}
-                  style={styles.detailButtonIcon}
-                />
-              </TouchableOpacity>
-            </View>
+          ))
+        ) : (
+          <View style={styles.center}>
+            <Text>No complaints available</Text>
           </View>
-        ))}
+        )}
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -133,7 +187,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   status: {
-    fontSize: 14,
+    fontSize: 10,
     color: "#666",
     textTransform: "capitalize",
   },
@@ -157,16 +211,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 3,
   },
   detailButtonText: {
     fontSize: 12,
     color: theme.colors.purple400,
     fontWeight: "bold",
   },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   detailButtonIcon: {
     marginLeft: 4,
   },
 });
-
-export default HistoryScreen;

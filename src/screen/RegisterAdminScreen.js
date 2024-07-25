@@ -26,7 +26,7 @@ import {
 import { theme } from "../themes/theme";
 const uri = "http://192.168.1.3:5000";
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterAdminScreen({ navigation }) {
   const [name, setName] = useState({ value: "", error: "" });
   const [username, setUsername] = useState({ value: "", error: "" });
   const [email, setEmail] = useState({ value: "", error: "" });
@@ -71,7 +71,10 @@ export default function RegisterScreen({ navigation }) {
         address: address.value,
         password: password.value,
       };
-      const request = await axios.post(`${uri}/register/user`, registerPayload);
+      const request = await axios.post(
+        `${uri}/admin/register`,
+        registerPayload
+      );
       const response = request.data;
 
       setIsLoading(false);
@@ -79,40 +82,23 @@ export default function RegisterScreen({ navigation }) {
         Toast.show({
           type: ALERT_TYPE.SUCCESS,
           title: "Register Successfully",
-          textBody: "Masuk ke akun anda untuk membuat pengaduan.",
+          textBody: "Berhasil Mendaftarkan Admin.",
         });
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "LoginUserScreen" }],
-        });
+        navigation.goBack();
       } else {
         Toast.show({
-          type: ALERT_TYPE.SUCCESS,
+          type: ALERT_TYPE.WARNING,
           title: "Register Error",
           textBody: response.message,
         });
       }
     } catch (error) {
       setIsLoading(false);
-      if (error.response) {
-        Toast.show({
-          type: ALERT_TYPE.DANGER,
-          title: "Register Failed",
-          textBody: error.message || "Something went wrong",
-        });
-      } else if (error.request) {
-        Toast.show({
-          type: ALERT_TYPE.DANGER,
-          title: "Register Failed",
-          textBody: "Network error. Please try again.",
-        });
-      } else {
-        Toast.show({
-          type: ALERT_TYPE.DANGER,
-          title: "Register Failed",
-          textBody: "An unexpected error occurred.",
-        });
-      }
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: "Register Failed",
+        textBody: error.response.data.message,
+      });
     }
   };
 
@@ -124,16 +110,12 @@ export default function RegisterScreen({ navigation }) {
     setShowPassword(!showPassword);
   };
 
-  const handleGoLogin = () => {
-    navigation.navigate("LoginUserScreen");
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <Background>
           <BackButton goBack={handleGoBack} />
-          <Header>Register</Header>
+          <Header>Register Admin</Header>
 
           <TextInput
             label="Name"
@@ -221,13 +203,6 @@ export default function RegisterScreen({ navigation }) {
           >
             {isLoading ? "..." : "DAFTAR"}
           </Button>
-
-          <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>Sudah Punya Akun? </Text>
-            <TouchableOpacity onPress={handleGoLogin}>
-              <Text style={styles.loginLink}>Masuk Disini</Text>
-            </TouchableOpacity>
-          </View>
         </Background>
       </ScrollView>
     </SafeAreaView>
@@ -265,8 +240,7 @@ const styles = StyleSheet.create({
     color: theme.colors.secondary,
   },
   loginLink: {
-    color: theme.colors.purple400,
+    color: theme.colors.primary,
     fontWeight: "bold",
-    textDecorationLine: "underline",
   },
 });

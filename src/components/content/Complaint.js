@@ -1,5 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,112 +6,123 @@ import {
   SafeAreaView,
   StyleSheet,
   ScrollView,
+  Image,
 } from "react-native";
-import axios from "axios"; // tambahkan import axios
 import { theme } from "../../themes/theme";
+import { useNavigation } from "@react-navigation/native";
+import SearchBar from "../SearchBar";
+import Icon from "react-native-vector-icons/Feather";
+import { debounce } from "lodash";
+import { useComplaints } from "../../contexts/ComplaintContext";
 
-export default function Complaint({ onEdit }) {
-  const [user, setUser] = useState({});
-  const [data, setData] = useState([]);
-  const [isLogin, setIsLogin] = useState(false);
+export default function Complaint({ user }) {
+  const navigation = useNavigation();
+  const { complaints, updateComplaints } = useComplaints();
+  const [filteredComplaints, setFilteredComplaints] = useState(complaints);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    fetchData();
+    setFilteredComplaints(complaints);
+  }, [complaints]);
 
-    const interval = setInterval(() => {
-      fetchData();
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, []);
-  const fetchData = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-
-      const currentUserRequest = await axios.get(
-        "http://192.168.1.4:1000/user/me",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const currentUserResponse = currentUserRequest.data;
-      console.log("user", currentUserResponse);
-      if (currentUserResponse.status) {
-        setUser(currentUserResponse.data);
+  const handleSearch = useCallback(
+    debounce((query) => {
+      if (query) {
+        const lowerCaseQuery = query.toLowerCase();
+        const filteredComplaints = complaints.filter((complaint) => {
+          return (
+            complaint.name.toLowerCase().includes(lowerCaseQuery) ||
+            (complaint.createdAt &&
+              complaint.createdAt.split("T")[0].includes(lowerCaseQuery)) ||
+            complaint.chronology.toLowerCase().includes(lowerCaseQuery) ||
+            complaint.status.toLowerCase().includes(lowerCaseQuery)
+          );
+        });
+        setFilteredComplaints(filteredComplaints);
+      } else {
+        setFilteredComplaints(complaints);
       }
+    }, 300),
+    [complaints]
+  );
 
-      if (currentUserResponse.data.id) {
-        const dataComplaint = await axios.get(
-          `http://192.168.1.4:1000/getCaseByUserId`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const payloadData = dataComplaint.data;
-        console.log(payloadData.data);
-        const filteredData = payloadData.data.filter(
-          (complaint) => complaint.status === "Menunggu konfirmasi"
-        );
-        setData(filteredData.reverse());
-      }
-    } catch (err) {
-      setIsLogin(false);
-    }
+  const handleSearchInputChange = (query) => {
+    setSearchQuery(query);
+    handleSearch(query);
   };
 
   const navigateToDetail = (id) => {
-    // fungsi navigasi detail, sesuaikan dengan implementasi navigasi Anda
-    console.log("Navigasi ke detail kasus dengan ID:", id);
+    if ((user && user.role === "Admin") || user.role === "superadmin") {
+      navigation.navigate("ComplaintDetailScreen", { id });
+    } else {
+      navigation.navigate("EditComplaintScreen", { id });
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* <SearchBar
+        placeholder="Search"
+        onChangeText={handleSearchInputChange}
+        value={searchQuery}
+        style={{
+          marginBottom: 10,
+          borderRadius: 20,
+          backgroundColor: "white",
+        }}
+      /> */}
       <ScrollView
         contentContainerStyle={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
-        {data.length > 0 ? (
-          data.map(
-            (complaint) => (
-              console.log("complaint", complaint),
-              (
-                <View key={complaint.id} style={styles.card}>
-                  <View style={styles.cardHeader}>
-                    <Text style={styles.title}>{complaint.name}</Text>
-                    <Text style={styles.status}>{complaint.status}</Text>
-                  </View>
-                  <View style={styles.cardBody}>
-                    <Text
-                      style={styles.date}
-                    >{`Tanggal: ${complaint.date}`}</Text>
-                    <Text
-                      numberOfLines={2}
-                      ellipsizeMode="tail"
-                      style={styles.description}
-                    >
-                      {complaint.chronology}
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.detailButton}
-                      onPress={() => navigateToDetail(complaint.id)}
-                    >
-                      <Text style={styles.detailButtonText}>
-                        Lihat Detail Kasus
-                      </Text>
-                      {/* Icon placeholder */}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )
-            )
-          )
+        {Array.isArray(filteredComplaints) && filteredComplaints ? (
+          filteredComplaints.map((complaint) => (
+            <View key={complaint.id} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.title}>{complaint.name}</Text>
+                <Text style={styles.status}>{complaint.status}</Text>
+              </View>
+              <View style={styles.cardBody}>
+                <Text style={styles.date}>{`Tanggal: ${
+                  complaint.createdAt
+                    ? complaint.createdAt.split("T")[0]
+                    : "N/A"
+                }`}</Text>
+                <Text
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                  style={styles.description}
+                >
+                  {complaint.chronology}
+                </Text>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() => navigateToDetail(complaint.id)}
+                >
+                  <Text style={styles.detailButtonText}>
+                    {(user && user.role === "Admin") ||
+                    user.role === "superadmin"
+                      ? "Lihat Detail Kasus"
+                      : "Edit Kasus"}
+                  </Text>
+                  <Icon
+                    name="arrow-right"
+                    size={16}
+                    color={theme.colors.purple400}
+                    style={styles.detailButtonIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))
         ) : (
-          <Text>Tidak ada data kasus yang ditemukan.</Text>
+          <View style={styles.imageContainer}>
+            <Image
+              source={require("../../assets/empty-folder.png")}
+              style={styles.noDataImage}
+            />
+            <Text style={styles.noDataText}>No complaints available</Text>
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -123,7 +133,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "rgb(229 231 235)",
   },
   scrollView: {
     flexGrow: 1,
@@ -134,11 +143,12 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     borderRadius: 8,
     overflow: "hidden",
-    backgroundColor: "rgb(243 244 246)",
+    backgroundColor: "white",
   },
   cardHeader: {
-    padding: 16,
-    backgroundColor: "rgb(243 244 246)",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    backgroundColor: "transparent",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -149,7 +159,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   status: {
-    fontSize: 14,
+    fontSize: 10,
     color: "#666",
     textTransform: "capitalize",
   },
@@ -164,7 +174,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: "#333",
-    marginBottom: 12,
+    textAlign: "justify",
   },
   detailButton: {
     borderRadius: 8,
@@ -182,5 +192,20 @@ const styles = StyleSheet.create({
   },
   detailButtonIcon: {
     marginLeft: 4,
+  },
+  imageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+  },
+  noDataImage: {
+    width: 200,
+    height: 200,
+  },
+  noDataText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    paddingTop: 20,
+    textAlign: "center",
   },
 });

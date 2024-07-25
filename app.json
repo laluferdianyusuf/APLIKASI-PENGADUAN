@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "pengaduan",
-    "slug": "pengaduan",
+    "name": "Aduanku",
+    "slug": "Aduanku",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
+    "icon": "./src/assets/aduanku.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./src/assets/splash.png",
+      "image": "./src/assets/tpdcom.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,12 +16,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/tpdcom.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ferdianyusuf.Aduanku"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2b210c29-13c3-4fc9-acc0-9d6cd0e6cb23"
+      }
     }
   }
 }
