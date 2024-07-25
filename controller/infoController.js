@@ -21,7 +21,6 @@ module.exports = {
         data: { informasi: createInformasi },
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         status: false,
         message: "Something error with the server",
@@ -76,7 +75,6 @@ module.exports = {
         data: { informasi: deletedInformasi },
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         status: false,
         message: "Something error with the server ",
@@ -89,7 +87,6 @@ module.exports = {
       const listInformasi = await Informasi.findAll();
 
       if (listInformasi.length > 0) {
-        console.log(listInformasi);
         return res.status(200).json({
           status: true,
           massage: "List Infromasi",
@@ -97,7 +94,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       return res.json(400).json({
         status: false,
         massage: "Terjadi kesalahan pada server",

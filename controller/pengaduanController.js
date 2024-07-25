@@ -1,8 +1,7 @@
-const { where } = require("sequelize");
 const nodeMailer = require("nodemailer");
 const { pengaduan } = require("../models");
 const { User } = require("../models");
-const { JWT, ROLES } = require("../lib/const");
+const { ROLES } = require("../lib/const");
 module.exports = {
   async complaintClient(req, res) {
     try {
@@ -106,7 +105,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.error(error);
       return res.status(400).json({
         status: false,
         message: "Gagal Membuat Pengaduan",
@@ -118,7 +116,6 @@ module.exports = {
   async updatePengaduan(req, res) {
     try {
       const user_id = req.user.id;
-      console.log(user_id);
       const { id } = req.params;
       const getPengaduanById = await pengaduan.findByPk(id);
       if (!getPengaduanById) {
@@ -207,7 +204,6 @@ module.exports = {
         data: { complaint: updatePengaduan },
       });
     } catch (error) {
-      console.error(error);
       return res.status(400).json({
         status: false,
         message: "Gagal Update Pengaduan",
@@ -218,7 +214,6 @@ module.exports = {
   async deletePengaduan(req, res) {
     try {
       const user_id = req.user.id;
-      console.log(user_id);
       const { id } = req.params;
       const result = await pengaduan.destroy({
         where: { id, userid: user_id },
@@ -235,7 +230,6 @@ module.exports = {
         data: { complaint: result },
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -260,7 +254,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       return res.json(400).json({
         status: false,
         massage: "Terjadi Kesalahan pada server",
@@ -311,7 +304,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         massage: "Terjadi Kesalahan pada server",
@@ -322,8 +314,6 @@ module.exports = {
   async getGender(req, res) {
     try {
       const getComplaint = await pengaduan.findAll({});
-      console.log(getComplaint.length);
-
       let genderCount = { male: 0, female: 0 };
 
       getComplaint.forEach((complaint) => {
@@ -354,7 +344,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.error(error);
       return res.status(400).json({
         status: false,
         message: "Unauthorized Access",
@@ -410,7 +399,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         status: false,
         message: "Unauthorize Access",
@@ -450,7 +438,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -489,7 +476,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -528,7 +514,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -554,7 +539,6 @@ module.exports = {
         data: { complaint: getCase },
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -566,7 +550,6 @@ module.exports = {
     try {
       const status = "Sedang diproses";
       const getComplaint = await pengaduan.findOne({ where: { status } });
-      console.log(getComplaint);
 
       if (!getComplaint) {
         return res.status(401).json({
@@ -581,7 +564,6 @@ module.exports = {
         data: { complaint: getComplaint },
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -593,7 +575,6 @@ module.exports = {
     try {
       const status = "Kasus Telah Selesai";
       const getComplaint = await pengaduan.findOne({ where: { status } });
-      console.log(getComplaint);
 
       if (!getComplaint) {
         return res.status(401).json({
@@ -608,7 +589,6 @@ module.exports = {
         data: { complaint: getComplaint },
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",

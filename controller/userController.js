@@ -80,7 +80,6 @@ module.exports = {
         data: { user: user },
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal melakukan registrasi",
@@ -92,9 +91,7 @@ module.exports = {
     try {
       const { username, password } = req.body;
       const admin = await User.findOne({ where: { username } });
-      console.log("username :", username);
       if (!admin) {
-        console.log("Belum melakukan registrasi");
         res.status(404).json({
           status: false,
           message: "Akun tidak ditemukan",
@@ -103,10 +100,8 @@ module.exports = {
         return;
       }
       const isPasswordCorrect = bcrypt.compareSync(password, admin.password);
-      console.log(isPasswordCorrect);
 
       if (!isPasswordCorrect) {
-        console.log("Password Tak Sama ");
         res.status(402).json({
           status: false,
           message: "Akun tidak ditemukan",
@@ -122,7 +117,6 @@ module.exports = {
           },
           JWT.SECRET
         );
-        console.log("Generate Token ", token);
         return res.status(200).json({
           status: true,
           message: "Berhasil Login",
@@ -130,7 +124,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalah pada server",
@@ -142,9 +135,7 @@ module.exports = {
     try {
       const { username, password } = req.body;
       const user = await User.findOne({ where: { username } });
-      console.log("username :", username);
       if (!user) {
-        console.log("Belum melakukan registrasi");
         res.status(401).json({
           status: false,
           message: "Akun tidak di temukan ",
@@ -153,10 +144,8 @@ module.exports = {
         return;
       }
       const isPasswordCorrect = bcrypt.compareSync(password, user.password);
-      console.log(isPasswordCorrect);
 
       if (!isPasswordCorrect) {
-        console.log("Password Tak Sama ");
         res.status(402).json({
           status: false,
           message: "Akun tidak di temukan ",
@@ -172,14 +161,12 @@ module.exports = {
         },
         JWT.SECRET
       );
-      console.log("Generate Token ", token);
       return res.status(200).json({
         status: true,
         message: "Berhasil Login",
         data: { token },
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -199,8 +186,6 @@ module.exports = {
     try {
       const { id } = req.params;
       const getAdmin = await User.findByPk(id);
-      console.log("Admin Sekarang: ", getAdmin);
-
       if (!getAdmin) {
         return res.status(404).json({
           status: false,
@@ -216,14 +201,12 @@ module.exports = {
         phoneNumber,
         address,
       });
-      console.log("Admin Terbaru: ", updateAdmin);
       return res.status(200).json({
         status: true,
         message: "Admin berhasil di perbarui",
         data: { admin: updateAdmin },
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Admin tidak di temukan",
@@ -235,8 +218,6 @@ module.exports = {
     try {
       const { id } = req.params;
       const getUser = await User.findByPk(id);
-      console.log("Current User : ", getUser);
-
       if (!getUser) {
         return res.status(404).json({
           status: false,
@@ -252,14 +233,12 @@ module.exports = {
         phoneNumber,
         address,
       });
-      console.log("Updated User : ", updateUser);
       return res.status(200).json({
         status: true,
         message: "Berhasil melakukan update",
         data: { user: updateUser },
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal melakukan update",
@@ -284,7 +263,6 @@ module.exports = {
         data: { user: result },
       });
     } catch (error) {
-      console.log(error);
       res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -301,7 +279,6 @@ module.exports = {
         data: { user: user },
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal mendapatkan semua user",
@@ -328,7 +305,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
@@ -340,8 +316,6 @@ module.exports = {
     try {
       const { id } = req.params;
       const getPengaduan = await pengaduan.findByPk(id);
-      console.log("getPengaduan: ", getPengaduan);
-
       if (!getPengaduan) {
         return res.status(401).json({
           status: false,
@@ -359,7 +333,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
       res.status(400).json({
         status: false,
         message: "Gagal memperbarui status pengaduan",
@@ -387,7 +360,6 @@ module.exports = {
         data: { admin: pengaduanDone },
       });
     } catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal melakukan pembaruan status pengaduan",
