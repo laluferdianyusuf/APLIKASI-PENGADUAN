@@ -7,6 +7,7 @@ const middleware = require("./middleware/auth");
 const pengaduanController = require("./controller/pengaduanController");
 const userController = require("./controller/userController");
 const infoController = require("./controller/infoController");
+const messageController = require("./controller/messageController");
 // const notifikasiController = require("./controller/notifikasiController");
 const app = express();
 
@@ -54,6 +55,11 @@ app.delete(
 app.get("/list/user", userController.listUser);
 app.get("/user/:id", userController.getUserById);
 app.get("/current/user", middleware.authenticate, userController.currentUser);
+app.get(
+  "/api/user/chat",
+  middleware.authenticate,
+  userController.getUserByChat
+);
 
 // Complaint form user / CRUD items
 app.post(
@@ -102,36 +108,30 @@ app.get(
   middleware.roles,
   pengaduanController.getComplaintDone
 );
-// app.get(
-//   "case/without",
-//   middleware.authenticate,
-//   middleware.roles,
-//   pengaduanController.getProcessCase
-// );
-// app.get(
-//   "/case/wait/process",
-//   middleware.authenticate,
-//   pengaduanController.getProcessCase
-// );
 
 // CRUD Informasi
 app.post("/create/info", infoController.createInfo);
 app.put("/update/Info", infoController.updateInfo);
-app.delete("/deleted/Info", infoController.deleteInfo);
+app.delete("/deleted/Info/:id", infoController.deleteInfo);
 app.get("/list/Info", infoController.listInfo);
 
-// complaint notifikasi
-// app.post(
-//   "/notif/admin",
-//   middleware.authenticate,
-//   pengaduanController.sendNotif
-// );
-// app.post(
-//   "/notification/create",
-//   middleware.authenticate,
-//   middleware.fireb,
-//   notifikasiController.createNotifComplaint
-// );
+// message api
+app.get("/api/message", middleware.authenticate, messageController.getMessage);
+app.get(
+  "/api/list/message/user",
+  middleware.authenticate,
+  messageController.getMessageById
+);
+app.post(
+  "/api/create/message",
+  middleware.authenticate,
+  messageController.createMessage
+);
+app.delete(
+  "/api/delete/message/:id",
+  middleware.authenticate,
+  messageController.deleteMessage
+);
 
 app.use(express.json());
 app.listen(process.env.PORT || 5000, function () {
