@@ -263,7 +263,7 @@ module.exports = {
       console.log(error);
       return res.json(400).json({
         status: false,
-        massage: "Unauthorize Access",
+        massage: "Terjadi Kesalahan pada server",
         data: { complaint: null },
       });
     }
@@ -292,7 +292,7 @@ module.exports = {
       console.log(error);
       return res.status(400).json({
         status: false,
-        massage: "Unauthorize Access",
+        massage: "Terjadi Kesalahan pada server",
         data: { complaint: null },
       });
     }
@@ -318,7 +318,7 @@ module.exports = {
       console.log(error);
       return res.status(400).json({
         status: false,
-        massage: "Unauthorize Access",
+        message: "Terjadi kesalahan pada server",
         data: { complaint: null },
       });
     }
@@ -333,21 +333,21 @@ module.exports = {
         console.log(getComplaint);
         return res.status(200).json({
           status: true,
-          massage: "List Pengaduan berdasarkan jenjang pendidikan",
+          message: "List Pengaduan berdasarkan jenjang pendidikan",
           data: { complaint: getComplaint },
         });
       } else {
         return res.status(404).json({
           status: false,
-          massage: "List Pengaduan tidak ditemukan",
+          message: "List Pengaduan tidak ditemukan",
           data: { complaint: null },
         });
       }
     } catch (error) {
       console.log(error);
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
-        massage: "Unauthorize Access",
+        message: "Terjadi Kesalahan pada server",
         data: { complaint: null },
       });
     }
@@ -466,32 +466,6 @@ module.exports = {
       res.status(400).json({
         status: false,
         message: "Terjadi kesalahan pada server",
-        data: { complaint: null },
-      });
-    }
-  },
-  async getGender(req, res) {
-    try {
-      const { gender } = req.query;
-      const getComplaint = await pengaduan.findAll({ where: { gender } });
-      if (getComplaint && getComplaint.length > 0) {
-        return res.status(200).json({
-          status: true,
-          massage: "List Pengaduan berdasarkan jenis kelamin",
-          data: { complaint: getComplaint },
-        });
-      } else {
-        return res.status(404).json({
-          status: false,
-          massage: "List Pengaduan Tidak di temukan",
-          data: { complaint: null },
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      return res.status(400).json({
-        status: false,
-        massage: "Unauthorize Access",
         data: { complaint: null },
       });
     }
