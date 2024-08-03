@@ -11,7 +11,7 @@ module.exports = {
       {
         name: "TPDotcom",
         username: "TPDotcom",
-        email: "TPDotcom@gmail.com",
+        email: "sedaikiseki1@gmail.com",
         phoneNumber: "111",
         address: "baleni",
         password: hashedPassword,

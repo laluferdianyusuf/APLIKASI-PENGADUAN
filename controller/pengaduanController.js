@@ -2,12 +2,15 @@ const nodeMailer = require("nodemailer");
 const { pengaduan } = require("../models");
 const { User } = require("../models");
 const { ROLES } = require("../lib/const");
+const { Op } = require("sequelize");
 module.exports = {
   async complaintClient(req, res) {
     try {
       const user_id = req.user.id;
       const sendComplaint = await User.findAll({
-        where: { role: ROLES.ADMIN },
+        where: {
+          [Op.or]: [{ role: ROLES.ADMIN }, { role: ROLES.SUPERADMIN }],
+        },
       });
       const transporter = nodeMailer.createTransport({
         service: "gmail",
@@ -105,6 +108,7 @@ module.exports = {
         });
       }
     } catch (error) {
+      console.log(error);
       return res.status(400).json({
         status: false,
         message: "Gagal Membuat Pengaduan",
@@ -254,7 +258,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.json(400).json({
+      return res.json(500).json({
         status: false,
         massage: "Terjadi Kesalahan pada server",
         data: { complaint: null },
@@ -296,15 +300,9 @@ module.exports = {
           massage: "List Pengaduan berdasarkan jenis kekerasan",
           data: { complaint: violenceCount },
         });
-      } else {
-        return res.status(404).json({
-          status: false,
-          massage: "List Pengaduan tidak ditemukan",
-          data: { complaint: null },
-        });
       }
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         massage: "Terjadi Kesalahan pada server",
         data: { complaint: null },
@@ -336,17 +334,11 @@ module.exports = {
           message: "List Pengaduan berdasarkan jenis kelamin",
           data: { complaint: genderCount },
         });
-      } else {
-        return res.status(404).json({
-          status: false,
-          message: "List Pengaduan tidak ditemukan",
-          data: null,
-        });
       }
     } catch (error) {
       return res.status(400).json({
         status: false,
-        message: "Unauthorized Access",
+        message: "Error" + error.message,
         error: error.message,
       });
     }
@@ -391,17 +383,11 @@ module.exports = {
           message: "List Pengaduan berdasarkan jenjang pendidikan",
           data: { complaint: complaintCounts },
         });
-      } else {
-        return res.status(404).json({
-          status: false,
-          message: "List Pengaduan tidak ditemukan",
-          data: { complaint: null },
-        });
       }
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Unauthorize Access",
+        message: "Error" + error.message,
         data: { complaint: null },
       });
     }
