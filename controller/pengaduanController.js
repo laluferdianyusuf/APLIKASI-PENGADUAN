@@ -105,7 +105,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Gagal Membuat Pengaduan",
         data: { complaint: null },
@@ -119,7 +119,7 @@ module.exports = {
       const { id } = req.params;
       const getPengaduanById = await pengaduan.findByPk(id);
       if (!getPengaduanById) {
-        return res.status(500).json({
+        return res.status(400).json({
           status: false,
           message: "Pengaduan tidak ditemukan",
           data: { complaint: null },
@@ -204,7 +204,7 @@ module.exports = {
         data: { complaint: updatePengaduan },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Gagal Update Pengaduan",
         data: { complaint: null },
@@ -230,7 +230,7 @@ module.exports = {
         data: { complaint: result },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { complaint: null },
@@ -254,7 +254,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.json(400).json({
+      return res.json(500).json({
         status: false,
         massage: "Terjadi Kesalahan pada server",
         data: { complaint: null },
@@ -304,7 +304,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         massage: "Terjadi Kesalahan pada server",
         data: { complaint: null },
@@ -344,9 +344,9 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
-        message: "Unauthorized Access",
+        message: "Terjadi kesalahan pada server",
         error: error.message,
       });
     }
@@ -401,7 +401,7 @@ module.exports = {
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Unauthorize Access",
+        message: "Terjadi kesalahan pada server",
         data: { complaint: null },
       });
     }
@@ -438,7 +438,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      res.status(400).json({
+      res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { complaint: null },
@@ -476,7 +476,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      res.status(400).json({
+      res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { complaint: null },
@@ -514,7 +514,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      res.status(400).json({
+      res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { complaint: null },
@@ -539,7 +539,7 @@ module.exports = {
         data: { complaint: getCase },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { complaint: null },

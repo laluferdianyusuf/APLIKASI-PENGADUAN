@@ -40,7 +40,7 @@ module.exports = {
         data: { admin: admin },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { admin: null },
@@ -80,7 +80,7 @@ module.exports = {
         data: { user: user },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Gagal melakukan registrasi",
         data: { user: null },
@@ -104,7 +104,7 @@ module.exports = {
       if (!isPasswordCorrect) {
         res.status(402).json({
           status: false,
-          message: "Akun tidak ditemukan",
+          message: "Password tak sama",
           data: { admin: null },
         });
         return;
@@ -124,7 +124,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Terjadi kesalah pada server",
         data: { admin: null },
@@ -148,7 +148,7 @@ module.exports = {
       if (!isPasswordCorrect) {
         res.status(402).json({
           status: false,
-          message: "Akun tidak di temukan ",
+          message: "Password tak sama ",
           data: { user: null },
         });
         return;
@@ -167,7 +167,7 @@ module.exports = {
         data: { token },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { user: null },
@@ -207,7 +207,7 @@ module.exports = {
         data: { admin: updateAdmin },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Admin tidak di temukan",
         data: { admin: null },
@@ -239,7 +239,7 @@ module.exports = {
         data: { user: updateUser },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Gagal melakukan update",
         data: { user: null },
@@ -263,7 +263,7 @@ module.exports = {
         data: { user: result },
       });
     } catch (error) {
-      res.status(400).json({
+      res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { user: null },
@@ -279,7 +279,7 @@ module.exports = {
         data: { user: user },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Gagal mendapatkan semua user",
         data: { user: null },
@@ -305,7 +305,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Terjadi kesalahan pada server",
         data: { user: null },
@@ -333,7 +333,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      res.status(400).json({
+      res.status(500).json({
         status: false,
         message: "Gagal memperbarui status pengaduan",
         data: { admin: null },
@@ -360,7 +360,7 @@ module.exports = {
         data: { admin: pengaduanDone },
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(500).json({
         status: false,
         message: "Gagal melakukan pembaruan status pengaduan",
         data: { admin: null },

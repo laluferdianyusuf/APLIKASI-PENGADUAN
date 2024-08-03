@@ -9,21 +9,21 @@ module.exports = {
         descriptions,
       });
       if (!createInformasi) {
-        return res.status(401).json({
+        return res.status(400).json({
           status: false,
-          message: "Failed create information",
+          message: "Gagal membuat informasi",
           data: { informasi: null },
         });
       }
       return res.status(200).json({
         status: true,
-        message: "Successfully created information",
+        message: "Berhasil membuat informasi",
         data: { informasi: createInformasi },
       });
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Something error with the server",
+        message: "Terjadi kesalahan pada server",
         data: { informasi: null },
       });
     }
@@ -36,9 +36,9 @@ module.exports = {
         descriptions,
       });
       if (!updateInformasi) {
-        return res.status(401).json({
+        return res.status(400).json({
           status: false,
-          message: "Failed to update information",
+          message: "Gagal memperbarui informasi",
           data: { informasi: null },
         });
       }
@@ -46,14 +46,14 @@ module.exports = {
         res.status(200),
         json({
           status: true,
-          message: "Successfuly updated information",
+          message: "Berhasil memperbarui informasi",
           data: { informasi: updateInformasi },
         })
       );
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Something error with the server",
+        message: "Terjadi kesalahan pada server",
         data: { informasi: null },
       });
     }
@@ -65,20 +65,20 @@ module.exports = {
       if (!deletedInformasi) {
         return res.status(400).json({
           status: false,
-          message: "Failed deleted information",
-          data: { informasi: deletedInformasi },
+          message: "Gagal menghapus informasi",
+          data: { informasi: null },
         });
       }
       return res.status(200).json({
         status: true,
-        message: "Successfuly deleted information",
+        message: "Berhasil menghapus informasi",
         data: { informasi: deletedInformasi },
       });
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Something error with the server ",
-        data: { informasi: deletedInformasi },
+        message: "Terjadi kesalahan pada server",
+        data: { informasi: null },
       });
     }
   },
@@ -94,7 +94,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      return res.json(400).json({
+      return res.json(500).json({
         status: false,
         massage: "Terjadi kesalahan pada server",
         data: { informasi: null },
