@@ -2,13 +2,12 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-// const adminController = require("./controller/adminController");
 const middleware = require("./middleware/auth");
 const pengaduanController = require("./controller/pengaduanController");
 const userController = require("./controller/userController");
 const infoController = require("./controller/infoController");
-const messageController = require("./controller/messageController");
-// const notifikasiController = require("./controller/notifikasiController");
+const noteController = require("./controller/noteController");
+const minatController = require("./controller/minatController");
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -115,23 +114,13 @@ app.put("/update/Info", infoController.updateInfo);
 app.delete("/deleted/Info/:id", infoController.deleteInfo);
 app.get("/list/Info", infoController.listInfo);
 
-// message api
-app.get("/api/message", middleware.authenticate, messageController.getMessage);
-app.get(
-  "/api/list/message/user",
-  middleware.authenticate,
-  messageController.getMessageById
-);
-app.post(
-  "/api/create/message",
-  middleware.authenticate,
-  messageController.createMessage
-);
-app.delete(
-  "/api/delete/message/:id",
-  middleware.authenticate,
-  messageController.deleteMessage
-);
+// CRUD Notes
+app.post("/create/notes", noteController.tambahNote);
+app.put("/update/notes/:id", noteController.updateNote);
+app.delete("/delete/notes/:id", noteController.deleteNote);
+
+// CRUD Minat
+app.post("/create/minat", minatController.tambahMinat);
 
 app.use(express.json());
 app.listen(process.env.PORT || 5000, function () {
