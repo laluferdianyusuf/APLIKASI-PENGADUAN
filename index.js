@@ -120,7 +120,7 @@ app.put("/update/notes/:id", noteController.updateNote);
 app.delete("/delete/notes/:id", noteController.deleteNote);
 
 // CRUD Minat
-app.post("/create/minat", minatController.tambahMinat);
+app.post("/create/minat", middleware.authenticate, minatController.tambahMinat);
 
 app.use(express.json());
 app.listen(process.env.PORT || 5000, function () {
