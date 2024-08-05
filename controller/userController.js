@@ -126,7 +126,7 @@ module.exports = {
     } catch (error) {
       return res.status(500).json({
         status: false,
-        message: "Terjadi kesalah pada server",
+        message: "Terjadi kesalahan pada server",
         data: { admin: null },
       });
     }
@@ -333,7 +333,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         status: false,
         message: "Gagal memperbarui status pengaduan",
         data: { admin: null },

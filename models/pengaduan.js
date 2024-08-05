@@ -9,26 +9,35 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      pengaduan.hasMany(models.victim, {
+        foreignKey: "pengaduanId",
+      });
+      pengaduan.hasMany(models.abuser, {
+        foreignKey: "pengaduanId",
+      });
+      pengaduan.hasMany(models.minat, {
+        foreignKey: "pengaduanId",
+      });
     }
   }
   pengaduan.init(
     {
+      // complaint identity
       userid: DataTypes.INTEGER,
-      name: DataTypes.STRING,
-      born: DataTypes.STRING,
-      gender: DataTypes.STRING,
-      nik: DataTypes.STRING,
-      address: DataTypes.STRING,
-      phoneNumber: DataTypes.STRING,
-      education: DataTypes.STRING,
-      // client Parents
-      parentName: DataTypes.STRING,
-      parentJob: DataTypes.STRING,
-      parentAddress: DataTypes.STRING,
-      parentNumber: DataTypes.STRING,
+      complaintName: DataTypes.STRING,
+      complaintAddress: DataTypes.STRING,
+      complaintEducate: DataTypes.STRING,
+      complaintNumber: DataTypes.STRING,
+      complaintRelation: DataTypes.STRING,
+      // Companion identity
+      companionName: DataTypes.STRING,
+      companionAddress: DataTypes.STRING,
+      companionEducate: DataTypes.STRING,
+      companionNumber: DataTypes.STRING,
+      companionRelation: DataTypes.STRING,
       // case form
-      caseType: DataTypes.STRING,
-      caseViolence: DataTypes.STRING,
+      caseType: DataTypes.JSON,
+      caseViolence: DataTypes.JSON,
       physical: DataTypes.STRING,
       sexual: DataTypes.STRING,
       psychology: DataTypes.STRING,
