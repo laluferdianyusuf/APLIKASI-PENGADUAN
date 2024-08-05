@@ -9,49 +9,49 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      // client
       userid: {
         type: Sequelize.INTEGER,
       },
-      name: {
+      // complaint identity
+      complaintName: {
         type: Sequelize.STRING,
       },
-      born: {
+      complaintAddress: {
         type: Sequelize.STRING,
       },
-      gender: {
+      complaintEducate: {
         type: Sequelize.STRING,
       },
-      nik: {
+      complaintNumber: {
         type: Sequelize.STRING,
       },
-      address: {
+      complaintRelation: {
         type: Sequelize.STRING,
       },
-      phoneNumber: {
+      // companion identity
+      companionName: {
         type: Sequelize.STRING,
       },
-      education: {
+      companionAddress: {
         type: Sequelize.STRING,
       },
-      // client Parents
-      parentName: {
+      companionEducate: {
         type: Sequelize.STRING,
       },
-      parentJob: {
+      companionNumber: {
         type: Sequelize.STRING,
       },
-      parentAddress: {
+      companionRelation: {
         type: Sequelize.STRING,
       },
-      parentNumber: {
-        type: Sequelize.STRING,
-      },
+      // abuser identity
       // case form
       caseType: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
       },
       caseViolence: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
       },
       physical: {
         type: Sequelize.STRING,
