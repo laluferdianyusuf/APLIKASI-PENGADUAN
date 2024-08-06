@@ -18,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       userId: DataTypes.INTEGER,
       pelatihan: DataTypes.STRING,
-      batik: DataTypes.STRING,
-      masak: DataTypes.STRING,
-      salon: DataTypes.STRING,
-      etc: DataTypes.STRING,
       pengaduanId: DataTypes.INTEGER,
     },
     {
