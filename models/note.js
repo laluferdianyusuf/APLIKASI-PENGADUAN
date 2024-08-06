@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   note.init(
     {
+      officerName: DataTypes.STRING,
       description: DataTypes.STRING,
       pengaduanId: DataTypes.INTEGER,
     },

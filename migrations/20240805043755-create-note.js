@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      officerName: {
+        type: Sequelize.STRING,
+      },
       description: {
         type: Sequelize.STRING,
       },

@@ -18,6 +18,9 @@ module.exports = (sequelize, DataTypes) => {
       pengaduan.hasMany(models.minat, {
         foreignKey: "pengaduanId",
       });
+      pengaduan.hasMany(models.note, {
+        foreignKey: "pengaduanId",
+      });
     }
   }
   pengaduan.init(

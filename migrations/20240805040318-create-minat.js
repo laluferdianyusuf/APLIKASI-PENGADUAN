@@ -15,18 +15,6 @@ module.exports = {
       pelatihan: {
         type: Sequelize.STRING,
       },
-      batik: {
-        type: Sequelize.STRING,
-      },
-      masak: {
-        type: Sequelize.STRING,
-      },
-      salon: {
-        type: Sequelize.STRING,
-      },
-      etc: {
-        type: Sequelize.STRING,
-      },
       pengaduanId: {
         type: Sequelize.INTEGER,
       },
