@@ -4,42 +4,10 @@ module.exports = {
   async tambahMinat(req, res) {
     try {
       const user_id = req.user.id;
-      const { pelatihan, batik, masak, salon, etc } = req.body;
-      if (pelatihan == "membatik" && !batik) {
-        return res.status(200).json({
-          status: true,
-          message: "Alasan",
-          data: { minat: null },
-        });
-      }
-      if (pelatihan == "memasak" && !masak) {
-        return res.status(200).json({
-          status: true,
-          message: "Alasan",
-          data: { minat: null },
-        });
-      }
-      if (pelatihan == "menyalon" && !salon) {
-        return res.status(200).json({
-          status: true,
-          message: "Alasan",
-          data: { minat: null },
-        });
-      }
-      if (pelatihan == "dll" && !etc) {
-        return res.status(200).json({
-          status: true,
-          message: "Alasan",
-          data: { minat: null },
-        });
-      }
+      const { pelatihan } = req.body;
       const createMinat = await minat.create({
         userId: user_id,
         pelatihan,
-        batik,
-        masak,
-        salon,
-        etc,
       });
       return res.status(200).json({
         status: true,
