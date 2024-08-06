@@ -1,5 +1,5 @@
 const nodeMailer = require("nodemailer");
-const { pengaduan, victim, abuser } = require("../models");
+const { pengaduan } = require("../models");
 const { User } = require("../models");
 const { ROLES } = require("../lib/const");
 const { Op } = require("sequelize");
@@ -21,17 +21,17 @@ module.exports = {
       });
 
       const {
-        complaintName,
-        complaintAddress,
-        complaintEducate,
-        complaintNumber,
-        complaintRelation,
-        companionName,
-        companionAddress,
-        companionEducate,
-        companionNumber,
-        companionRelation,
-        victims,
+        name,
+        born,
+        gender,
+        nik,
+        address,
+        phoneNumber,
+        education,
+        parentName,
+        parentJob,
+        parentAddress,
+        parentNumber,
         caseType,
         caseViolence,
         physical,
@@ -39,7 +39,6 @@ module.exports = {
         psychology,
         economy,
         chronology,
-        abusers,
       } = req.body;
       if (caseViolence == "fisik" && !physical) {
         return res.status(200).json({
@@ -80,16 +79,17 @@ module.exports = {
       };
       const createPengaduan = await pengaduan.create({
         userid: user_id,
-        complaintName,
-        complaintAddress,
-        complaintEducate,
-        complaintNumber,
-        complaintRelation,
-        companionName,
-        companionAddress,
-        companionEducate,
-        companionNumber,
-        companionRelation,
+        name,
+        born,
+        gender,
+        nik,
+        address,
+        phoneNumber,
+        education,
+        parentName,
+        parentJob,
+        parentAddress,
+        parentNumber,
         caseType,
         caseViolence,
         physical,
@@ -100,19 +100,6 @@ module.exports = {
         status: "Menunggu konfirmasi",
       });
       if (createPengaduan) {
-        for (const vic of victims) {
-          await victim.create({
-            ...vic,
-            pengaduanId: createPengaduan.id,
-          });
-        }
-
-        for (const abuse of abusers) {
-          await abuser.create({
-            ...abuse,
-            pengaduanId: createPengaduan.id,
-          });
-        }
         await transporter.sendMail(mailOption);
         return res.status(200).json({
           status: true,
@@ -121,8 +108,6 @@ module.exports = {
         });
       }
     } catch (error) {
-      console.log(error);
-
       return res.status(500).json({
         status: false,
         message: "Gagal Membuat Pengaduan",
