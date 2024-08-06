@@ -99,11 +99,13 @@ app.get(
 app.get("/case/:id", pengaduanController.getComplaintbyId);
 app.get(
   "complaint/update/status",
+  middleware.authenticate,
   middleware.roles,
   pengaduanController.getComplaintUpdate
 );
 app.get(
   "complaint/done/status",
+  middleware.authenticate,
   middleware.roles,
   pengaduanController.getComplaintDone
 );
@@ -115,9 +117,24 @@ app.delete("/deleted/Info/:id", infoController.deleteInfo);
 app.get("/list/Info", infoController.listInfo);
 
 // CRUD Notes
-app.post("/create/notes", noteController.tambahNote);
-app.put("/update/notes/:id", noteController.updateNote);
-app.delete("/delete/notes/:id", noteController.deleteNote);
+app.post(
+  "/create/notes",
+  middleware.authenticate,
+  middleware.roles,
+  noteController.tambahNote
+);
+app.put(
+  "/update/notes/:id",
+  middleware.authenticate,
+  middleware.roles,
+  noteController.updateNote
+);
+app.delete(
+  "/delete/notes/:id",
+  middleware.authenticate,
+  middleware.roles,
+  noteController.deleteNote
+);
 
 // CRUD Minat
 app.post("/create/minat", middleware.authenticate, minatController.tambahMinat);
