@@ -122,7 +122,6 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
-
       return res.status(500).json({
         status: false,
         message: "Gagal Membuat Pengaduan",
@@ -145,17 +144,17 @@ module.exports = {
       }
 
       const {
-        name,
-        born,
-        gender,
-        nik,
-        address,
-        phoneNumber,
-        education,
-        parentName,
-        parentJob,
-        parentAddress,
-        parentNumber,
+        complaintName,
+        complaintAddress,
+        complaintEducate,
+        complaintNumber,
+        complaintRelation,
+        companionName,
+        companionAddress,
+        companionEducate,
+        companionNumber,
+        companionRelation,
+        victims,
         caseType,
         caseViolence,
         physical,
@@ -163,6 +162,7 @@ module.exports = {
         psychology,
         economy,
         chronology,
+        abusers,
       } = req.body;
       if (caseViolence === "fisik" && !physical) {
         return res.status(401).json({
@@ -195,17 +195,16 @@ module.exports = {
 
       const updatePengaduan = await getPengaduanById.update({
         userid: user_id,
-        name,
-        born,
-        gender,
-        nik,
-        address,
-        phoneNumber,
-        education,
-        parentName,
-        parentJob,
-        parentAddress,
-        parentNumber,
+        complaintName,
+        complaintAddress,
+        complaintEducate,
+        complaintNumber,
+        complaintRelation,
+        companionName,
+        companionAddress,
+        companionEducate,
+        companionNumber,
+        companionRelation,
         caseType,
         caseViolence,
         physical,
@@ -215,12 +214,26 @@ module.exports = {
         chronology,
         status: "Menunggu Konfirmasi",
       });
+      if (updatePengaduan) {
+        for (const vic of victims) {
+          await victim.create({
+            ...vic,
+            pengaduanId: updatePengaduan.id,
+          });
+        }
 
-      return res.status(200).json({
-        status: true,
-        message: "Update Sukses",
-        data: { complaint: updatePengaduan },
-      });
+        for (const abuse of abusers) {
+          await abuser.create({
+            ...abuse,
+            pengaduanId: updatePengaduan.id,
+          });
+        }
+        return res.status(200).json({
+          status: true,
+          message: "Update Sukses",
+          data: { complaint: updatePengaduan },
+        });
+      }
     } catch (error) {
       return res.status(500).json({
         status: false,
