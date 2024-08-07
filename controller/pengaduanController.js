@@ -113,6 +113,7 @@ module.exports = {
             pengaduanId: createPengaduan.id,
           });
         }
+
         await transporter.sendMail(mailOption);
         return res.status(200).json({
           status: true,
@@ -164,6 +165,7 @@ module.exports = {
         chronology,
         abusers,
       } = req.body;
+
       if (caseViolence === "fisik" && !physical) {
         return res.status(401).json({
           status: false,
@@ -242,6 +244,7 @@ module.exports = {
       });
     }
   },
+
   async deletePengaduan(req, res) {
     try {
       const user_id = req.user.id;
