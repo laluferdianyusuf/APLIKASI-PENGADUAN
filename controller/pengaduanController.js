@@ -216,16 +216,16 @@ module.exports = {
       });
       if (updatePengaduan) {
         for (const vic of victims) {
-          await victim.create({
+          await victim.update({
             ...vic,
-            pengaduanId: updatePengaduan.id,
+            where: { pengaduanId: updatePengaduan.id },
           });
         }
 
         for (const abuse of abusers) {
-          await abuser.create({
+          await abuser.update({
             ...abuse,
-            pengaduanId: updatePengaduan.id,
+            where: { pengaduanId: updatePengaduan.id },
           });
         }
         return res.status(200).json({
@@ -235,6 +235,7 @@ module.exports = {
         });
       }
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         status: false,
         message: "Gagal Update Pengaduan",
