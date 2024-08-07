@@ -1,12 +1,16 @@
 const { where } = require("sequelize");
-const { note } = require("../models");
+const { pengaduan, note } = require("../models");
 
 module.exports = {
   async tambahNote(req, res) {
     try {
-      const { description } = req.body;
+      const { officerName, description } = req.body;
+      const { id } = req.params;
+      const getIdComplaint = await pengaduan.findByPk(id);
       const createNote = await note.create({
+        officerName,
         description,
+        pengaduanId: getIdComplaint.id,
       });
       return res.status(200).json({
         status: true,
@@ -25,7 +29,7 @@ module.exports = {
   async updateNote(req, res) {
     try {
       const { id } = req.params;
-      const { description } = req.body;
+      const { officerName, description } = req.body;
       const getNotes = await note.findByPk(id);
       if (!getNotes) {
         return res.status(400).json({
@@ -35,6 +39,7 @@ module.exports = {
         });
       }
       const updatedNote = await getNotes.update({
+        officerName,
         description,
       });
       return res.status(200).json({

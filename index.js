@@ -118,7 +118,7 @@ app.get("/list/Info", infoController.listInfo);
 
 // CRUD Notes
 app.post(
-  "/create/notes",
+  "/create/notes/:id",
   middleware.authenticate,
   middleware.roles,
   noteController.tambahNote
