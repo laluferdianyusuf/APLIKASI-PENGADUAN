@@ -82,7 +82,10 @@ module.exports = {
   },
   async getAllNote(req, res) {
     try {
-      const getNote = await note.findAll();
+      const { id } = req.params;
+      const getNote = await note.findAll({
+        where: { pengaduanId: id },
+      });
       return res.status(200).json({
         status: true,
         message: "Berhasil menghapus notes",

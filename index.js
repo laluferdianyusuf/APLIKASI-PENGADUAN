@@ -8,6 +8,7 @@ const userController = require("./controller/userController");
 const infoController = require("./controller/infoController");
 const noteController = require("./controller/noteController");
 const minatController = require("./controller/minatController");
+const victimController = require("./controller/VictimController");
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -79,8 +80,8 @@ app.delete(
 );
 app.get("/list/case", pengaduanController.listComplaint);
 app.get("/case/violence", pengaduanController.getCaseViolence);
-app.get("/case/gender", pengaduanController.getGender);
-app.get("/case/education", pengaduanController.getCaseByEducation);
+app.get("/case/gender", victimController.getGender);
+app.get("/case/education", victimController.getCaseByEducation);
 app.get(
   "/case/wait/admin/id",
   middleware.authenticate,
@@ -135,9 +136,23 @@ app.delete(
   middleware.roles,
   noteController.deleteNote
 );
+app.get(
+  "/notes/:id",
+  middleware.authenticate,
+  middleware.roles,
+  noteController.deleteNote
+);
 
 // CRUD Minat
 app.post("/create/minat", middleware.authenticate, minatController.tambahMinat);
+
+// Export Excell
+app.get(
+  "/export/excel",
+  // middleware.authenticate,
+  // middleware.roles,
+  pengaduanController.createExcel
+);
 
 app.use(express.json());
 app.listen(process.env.PORT || 5000, function () {
