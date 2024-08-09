@@ -80,4 +80,20 @@ module.exports = {
       });
     }
   },
+  async getAllNote(req, res) {
+    try {
+      const getNote = await note.findAll();
+      return res.status(200).json({
+        status: true,
+        message: "Berhasil menghapus notes",
+        data: { notes: getNote },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: false,
+        message: "Terjadi kesalahan pada server",
+        data: { notes: null },
+      });
+    }
+  },
 };
